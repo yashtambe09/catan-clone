@@ -9,6 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     deploy:
       resources:
         limits:
@@ -23,6 +24,7 @@ services:
       - ./backend:/app
     environment:
       DATABASE_URL: postgresql://catan:catan@postgres:5432/catan
+      JWT_SECRET: ${JWT_SECRET:-dev-only-insecure-secret-change-me}
     depends_on:
       - postgres
     deploy:

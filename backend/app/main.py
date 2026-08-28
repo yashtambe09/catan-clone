@@ -1,7 +1,31 @@
+from contextlib import asynccontextmanager
+
 import socketio
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-fastapi_app = FastAPI(title="Catan Clone API")
+from app.auth import router as auth_router
+from app.db import create_pool
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.db_pool = await create_pool()
+    yield
+    await app.state.db_pool.close()
+
+
+fastapi_app = FastAPI(title="Catan Clone API", lifespan=lifespan)
+
+fastapi_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+fastapi_app.include_router(auth_router)
 
 
 @fastapi_app.get("/health")
