@@ -16,7 +16,7 @@ Real-time multiplayer Catan clone. Full context lives in `decisions.md` (archite
 - Frontend: one Redux slice per concern under `src/store/`; components stay presentational, side effects (socket events) live in `useEffect` or dedicated middleware as it grows.
 - No custom crypto — auth (Day 2+) uses `argon2-cffi`/`passlib` and vetted JWT libraries only.
 - Don't add abstractions, error handling, or config for cases that can't happen yet at this stage of the project — this is a greenfield build, not a hardening pass.
-- Test commands: none yet (no test suite exists as of Day 1). First real logic to test is the Day 3-4 board generator — add pytest then.
+- Tests: pytest, in `backend/tests/`. Run with `docker compose exec backend pytest -q`. Pure game logic under `backend/app/game/` is expected to stay fully testable without a DB or socket connection — keep it that way.
 
 ## 3. Working Conventions (Token Discipline)
 
