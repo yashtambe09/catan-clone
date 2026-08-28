@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="100,10 177.94,55 177.94,145 100,190 22.06,145 22.06,55" fill="oklch(62% 0.09 230)" stroke="oklch(25% 0.02 60)" stroke-opacity="0.25" stroke-width="3"/>
+  <g stroke="oklch(99% 0.008 85)" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round" fill="none">
+    <path d="M50 80 Q65 70 80 80 T110 80 T140 80"/>
+    <path d="M50 105 Q65 95 80 105 T110 105 T140 105"/>
+    <path d="M50 130 Q65 120 80 130 T110 130 T140 130"/>
+  </g>
+</svg>

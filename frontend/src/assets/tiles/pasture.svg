@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="100,10 177.94,55 177.94,145 100,190 22.06,145 22.06,55" fill="oklch(70% 0.10 140)" stroke="oklch(25% 0.02 60)" stroke-opacity="0.35" stroke-width="3"/>
+  <g transform="translate(45,38) scale(1.1)">
+    <circle cx="38" cy="52" r="19" fill="oklch(99% 0.008 85)"/>
+    <circle cx="58" cy="46" r="15" fill="oklch(99% 0.008 85)"/>
+    <circle cx="50" cy="62" r="17" fill="oklch(99% 0.008 85)"/>
+    <circle cx="68" cy="58" r="9" fill="oklch(99% 0.008 85)"/>
+  </g>
+  <text x="100" y="158" text-anchor="middle" font-family="Karla, sans-serif" font-weight="700" font-size="14" letter-spacing="1" fill="oklch(25% 0.02 60)">SHEEP</text>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 168">
+  <rect x="2" y="2" width="116" height="164" rx="10" fill="oklch(50% 0.12 300)" stroke="oklch(99% 0.008 85)" stroke-width="3"/>
+  <g stroke="oklch(99% 0.008 85)" stroke-opacity="0.1" stroke-width="2">
+    <line x1="2" y1="44" x2="118" y2="128"/>
+    <line x1="2" y1="86" x2="118" y2="86"/>
+    <line x1="2" y1="128" x2="118" y2="44"/>
+  </g>
+  <g transform="translate(37,34) scale(2)">
+    <path d="M12 2 L21 7.5 V16.5 L12 22 L3 16.5 V7.5 Z" fill="oklch(99% 0.008 85)"/>
+    <path d="M12 2 L21 7.5 L12 12 L3 7.5 Z" fill="oklch(50% 0.12 300)"/>
+  </g>
+  <text x="60" y="122" text-anchor="middle" font-family="Bitter, serif" font-weight="700" font-size="12" letter-spacing="1.5" fill="oklch(99% 0.008 85)">DEVELOPMENT</text>
+</svg>

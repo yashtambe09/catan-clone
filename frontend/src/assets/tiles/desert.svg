@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="100,10 177.94,55 177.94,145 100,190 22.06,145 22.06,55" fill="oklch(85% 0.05 85)" stroke="oklch(25% 0.02 60)" stroke-opacity="0.35" stroke-width="3"/>
+  <g stroke="oklch(70% 0.05 80)" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M55 95 Q75 82 95 95 T135 95"/>
+    <path d="M50 115 Q72 100 94 115 T140 115"/>
+  </g>
+  <text x="100" y="158" text-anchor="middle" font-family="Karla, sans-serif" font-weight="700" font-size="14" letter-spacing="1" fill="oklch(45% 0.02 60)">DESERT</text>
+</svg>

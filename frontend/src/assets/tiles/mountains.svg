@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="100,10 177.94,55 177.94,145 100,190 22.06,145 22.06,55" fill="oklch(55% 0.02 250)" stroke="oklch(25% 0.02 60)" stroke-opacity="0.35" stroke-width="3"/>
+  <g transform="translate(45,38) scale(1.1)">
+    <polygon points="50,14 74,46 60,82 40,82 26,46" fill="oklch(99% 0.008 85)"/>
+    <polygon points="50,14 74,46 50,50" fill="oklch(99% 0.008 85)" opacity="0.55"/>
+    <polygon points="50,14 26,46 50,50" fill="oklch(99% 0.008 85)" opacity="0.8"/>
+  </g>
+  <text x="100" y="158" text-anchor="middle" font-family="Karla, sans-serif" font-weight="700" font-size="14" letter-spacing="1" fill="oklch(99% 0.008 85)">ORE</text>
+</svg>

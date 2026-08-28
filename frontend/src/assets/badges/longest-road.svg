@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 170">
+  <circle cx="70" cy="66" r="58" fill="oklch(75% 0.13 85)" stroke="oklch(25% 0.02 60)" stroke-width="2"/>
+  <circle cx="70" cy="66" r="46" fill="oklch(99% 0.008 85)"/>
+  <path d="M34 90 Q52 50 70 66 Q88 82 106 42" fill="none" stroke="oklch(52% 0.16 35)" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="34" cy="90" r="6" fill="oklch(52% 0.16 35)"/>
+  <circle cx="106" cy="42" r="6" fill="oklch(52% 0.16 35)"/>
+  <text x="70" y="140" text-anchor="middle" font-family="Bitter, serif" font-weight="700" font-size="16" fill="oklch(25% 0.02 60)">Longest Road</text>
+  <text x="70" y="158" text-anchor="middle" font-family="Karla, sans-serif" font-weight="700" font-size="12" fill="oklch(45% 0.02 60)">+2 VP</text>
+</svg>
