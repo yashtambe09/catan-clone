@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Docker / DB data
+pgdata/
+
+# Claude Code tooling (installed Day 14 — see decisions.md)
+graph.json
+GRAPH_REPORT.md
+.claude-mem/
+
+# OS
+.DS_Store
+Thumbs.db
