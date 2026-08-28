@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Karla:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(52% 0.16 35); text-decoration: none; }
+    a:hover { color: oklch(42% 0.16 35); }
+  </style>
+</helmet>
+<div style="width:1280px;height:800px;box-sizing:border-box;background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:26px 56px;border-bottom:1px solid oklch(88% 0.02 75);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2 L21 7.5 V16.5 L12 22 L3 16.5 V7.5 Z" fill="oklch(52% 0.16 35)"/>
+        <path d="M12 2 L21 7.5 L12 12 L3 7.5 Z" fill="oklch(75% 0.13 85)"/>
+      </svg>
+      <span style="font-family:'Bitter',serif;font-weight:700;font-size:21px;letter-spacing:0.02em;color:oklch(25% 0.02 60);">CATAN</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:32px;">
+      <span style="font-size:15px;font-weight:600;color:oklch(25% 0.02 60);border-bottom:2px solid oklch(52% 0.16 35);padding-bottom:4px;">Play</span>
+      <span style="font-size:15px;color:oklch(45% 0.02 60);">Stats</span>
+      <div style="width:36px;height:36px;border-radius:50%;background:oklch(52% 0.16 35);display:flex;align-items:center;justify-content:center;color:#fdf8ee;font-weight:700;font-size:14px;">Y</div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:36px;padding:0 56px;">
+
+    <div style="width:420px;background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:12px;padding:32px;box-shadow:0 1px 2px oklch(30% 0.02 60 / 0.06), 0 8px 20px oklch(30% 0.02 60 / 0.08);display:flex;flex-direction:column;gap:20px;">
+      <div>
+        <h2 style="font-family:'Bitter',serif;margin:0 0 6px;font-size:22px;color:oklch(25% 0.02 60);">Create a Game</h2>
+        <p style="margin:0;color:oklch(45% 0.02 60);font-size:14px;line-height:1.5;">Pick a player count and open a new room.</p>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:10px;">Players</div>
+        <div style="display:flex;gap:8px;">
+          <div style="width:52px;height:44px;border-radius:8px;border:2px solid oklch(85% 0.03 70);display:flex;align-items:center;justify-content:center;font-weight:700;color:oklch(45% 0.02 60);">2</div>
+          <div style="width:52px;height:44px;border-radius:8px;border:2px solid oklch(85% 0.03 70);display:flex;align-items:center;justify-content:center;font-weight:700;color:oklch(45% 0.02 60);">3</div>
+          <div style="width:52px;height:44px;border-radius:8px;border:2px solid oklch(52% 0.16 35);background:oklch(52% 0.16 35);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fdf8ee;">4</div>
+          <div style="width:52px;height:44px;border-radius:8px;border:2px solid oklch(85% 0.03 70);display:flex;align-items:center;justify-content:center;font-weight:700;color:oklch(45% 0.02 60);">5</div>
+          <div style="width:52px;height:44px;border-radius:8px;border:2px solid oklch(85% 0.03 70);display:flex;align-items:center;justify-content:center;font-weight:700;color:oklch(45% 0.02 60);">6</div>
+        </div>
+      </div>
+      <button style="width:100%;padding:14px;border-radius:8px;border:none;background:oklch(52% 0.16 35);color:#fdf8ee;font-weight:700;font-size:15px;font-family:'Karla',sans-serif;cursor:pointer;">Create Room</button>
+    </div>
+
+    <div style="width:420px;background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:12px;padding:32px;box-shadow:0 1px 2px oklch(30% 0.02 60 / 0.06), 0 8px 20px oklch(30% 0.02 60 / 0.08);display:flex;flex-direction:column;gap:20px;">
+      <div>
+        <h2 style="font-family:'Bitter',serif;margin:0 0 6px;font-size:22px;color:oklch(25% 0.02 60);">Join a Game</h2>
+        <p style="margin:0;color:oklch(45% 0.02 60);font-size:14px;line-height:1.5;">Enter the room code a friend sent you.</p>
+      </div>
+      <input value="F3XQ2R" readonly style="width:100%;box-sizing:border-box;padding:14px;border-radius:8px;border:2px solid oklch(85% 0.03 70);font-size:16px;letter-spacing:0.12em;font-weight:700;color:oklch(25% 0.02 60);background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;text-align:center;">
+      <button style="width:100%;padding:14px;border-radius:8px;border:2px solid oklch(52% 0.16 35);background:transparent;color:oklch(52% 0.16 35);font-weight:700;font-size:15px;font-family:'Karla',sans-serif;cursor:pointer;">Join Room</button>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

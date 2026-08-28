@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Karla:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(52% 0.16 35); text-decoration: none; }
+    a:hover { color: oklch(42% 0.16 35); }
+  </style>
+</helmet>
+
+<div style="width:1280px;height:860px;box-sizing:border-box;background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:26px 56px;border-bottom:1px solid oklch(88% 0.02 75);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2 L21 7.5 V16.5 L12 22 L3 16.5 V7.5 Z" fill="oklch(52% 0.16 35)"/>
+        <path d="M12 2 L21 7.5 L12 12 L3 7.5 Z" fill="oklch(75% 0.13 85)"/>
+      </svg>
+      <span style="font-family:'Bitter',serif;font-weight:700;font-size:21px;letter-spacing:0.02em;color:oklch(25% 0.02 60);">CATAN</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:32px;">
+      <span style="font-size:15px;color:oklch(45% 0.02 60);">Play</span>
+      <span style="font-size:15px;font-weight:600;color:oklch(25% 0.02 60);border-bottom:2px solid oklch(52% 0.16 35);padding-bottom:4px;">Stats</span>
+      <div style="width:36px;height:36px;border-radius:50%;background:oklch(52% 0.16 35);display:flex;align-items:center;justify-content:center;color:#fdf8ee;font-weight:700;font-size:14px;">Y</div>
+    </div>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow:hidden;padding:36px 56px;display:flex;flex-direction:column;gap:28px;">
+
+    <div>
+      <h1 style="font-family:'Bitter',serif;margin:0 0 4px;font-size:26px;color:oklch(25% 0.02 60);">Career Stats</h1>
+      <p style="margin:0;color:oklch(45% 0.02 60);font-size:14px;">yash &mdash; settling since Day 1</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:20px;">
+      <div style="background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:10px;padding:20px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:8px;">Games Played</div>
+        <div style="font-family:'Bitter',serif;font-size:30px;font-weight:700;color:oklch(25% 0.02 60);">24</div>
+      </div>
+      <div style="background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:10px;padding:20px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:8px;">Wins</div>
+        <div style="font-family:'Bitter',serif;font-size:30px;font-weight:700;color:oklch(58% 0.13 145);">9</div>
+      </div>
+      <div style="background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:10px;padding:20px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:8px;">Losses</div>
+        <div style="font-family:'Bitter',serif;font-size:30px;font-weight:700;color:oklch(25% 0.02 60);">15</div>
+      </div>
+      <div style="background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:10px;padding:20px;">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:8px;">Win Rate</div>
+        <div style="font-family:'Bitter',serif;font-size:30px;font-weight:700;color:oklch(52% 0.16 35);">37.5%</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:10px;overflow:hidden;">
+      <div style="padding:16px 24px;border-bottom:1px solid oklch(88% 0.02 75);font-weight:700;font-size:15px;color:oklch(25% 0.02 60);">Match History</div>
+
+      <div style="display:grid;grid-template-columns:1.1fr 2fr 1fr 1fr 1fr;gap:12px;padding:10px 24px;font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:oklch(45% 0.02 60);border-bottom:1px solid oklch(90% 0.015 80);">
+        <span>Date</span><span>Opponents</span><span>Board</span><span>Placement</span><span>Result</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.1fr 2fr 1fr 1fr 1fr;gap:12px;padding:14px 24px;align-items:center;border-bottom:1px solid oklch(93% 0.01 80);font-size:14px;color:oklch(25% 0.02 60);">
+        <span>Aug 27</span><span>Priya, Jordan, Sam</span><span>19-hex</span><span>1st</span>
+        <span style="justify-self:start;padding:4px 12px;border-radius:999px;background:oklch(58% 0.13 145 / 0.16);color:oklch(40% 0.13 145);font-weight:700;font-size:12px;">Win</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.1fr 2fr 1fr 1fr 1fr;gap:12px;padding:14px 24px;align-items:center;border-bottom:1px solid oklch(93% 0.01 80);font-size:14px;color:oklch(25% 0.02 60);">
+        <span>Aug 24</span><span>Priya, Jordan, Sam, Alex, Nina</span><span>30-hex</span><span>3rd</span>
+        <span style="justify-self:start;padding:4px 12px;border-radius:999px;background:oklch(45% 0.02 60 / 0.1);color:oklch(45% 0.02 60);font-weight:700;font-size:12px;">Loss</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.1fr 2fr 1fr 1fr 1fr;gap:12px;padding:14px 24px;align-items:center;border-bottom:1px solid oklch(93% 0.01 80);font-size:14px;color:oklch(25% 0.02 60);">
+        <span>Aug 20</span><span>Jordan, Sam</span><span>19-hex</span><span>2nd</span>
+        <span style="justify-self:start;padding:4px 12px;border-radius:999px;background:oklch(45% 0.02 60 / 0.1);color:oklch(45% 0.02 60);font-weight:700;font-size:12px;">Loss</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1.1fr 2fr 1fr 1fr 1fr;gap:12px;padding:14px 24px;align-items:center;font-size:14px;color:oklch(25% 0.02 60);">
+        <span>Aug 17</span><span>Priya, Sam</span><span>19-hex</span><span>1st</span>
+        <span style="justify-self:start;padding:4px 12px;border-radius:999px;background:oklch(58% 0.13 145 / 0.16);color:oklch(40% 0.13 145);font-weight:700;font-size:12px;">Win</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

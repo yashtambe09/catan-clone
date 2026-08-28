@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Karla:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(52% 0.16 35); text-decoration: none; }
+    a:hover { color: oklch(42% 0.16 35); }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:900px;box-sizing:border-box;background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="flex-shrink:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid oklch(88% 0.02 75);">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2 L21 7.5 V16.5 L12 22 L3 16.5 V7.5 Z" fill="oklch(52% 0.16 35)"/>
+        <path d="M12 2 L21 7.5 L12 12 L3 7.5 Z" fill="oklch(75% 0.13 85)"/>
+      </svg>
+      <div>
+        <div style="font-family:'Bitter',serif;font-weight:700;font-size:15px;color:oklch(25% 0.02 60);line-height:1.2;">CATAN</div>
+        <div style="font-size:12px;color:oklch(50% 0.02 60);line-height:1.2;">Room F3XQ2R &middot; 4 players</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 20px;border-radius:999px;background:oklch(75% 0.13 85);">
+      <span style="width:8px;height:8px;border-radius:50%;background:oklch(52% 0.16 35);flex-shrink:0;"></span>
+      <span style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Your turn &mdash; build or trade, then end turn</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="34" height="34" viewBox="0 0 40 40"><rect x="1" y="1" width="38" height="38" rx="8" fill="#fdf8ee" stroke="oklch(70% 0.03 70)" stroke-width="1.5"/><circle cx="11" cy="11" r="3.2" fill="oklch(25% 0.02 60)"/><circle cx="20" cy="20" r="3.2" fill="oklch(25% 0.02 60)"/><circle cx="29" cy="29" r="3.2" fill="oklch(25% 0.02 60)"/></svg>
+      <svg width="34" height="34" viewBox="0 0 40 40"><rect x="1" y="1" width="38" height="38" rx="8" fill="#fdf8ee" stroke="oklch(70% 0.03 70)" stroke-width="1.5"/><circle cx="11" cy="11" r="3.2" fill="oklch(25% 0.02 60)"/><circle cx="29" cy="11" r="3.2" fill="oklch(25% 0.02 60)"/><circle cx="20" cy="20" r="3.2" fill="oklch(25% 0.02 60)"/><circle cx="11" cy="29" r="3.2" fill="oklch(25% 0.02 60)"/><circle cx="29" cy="29" r="3.2" fill="oklch(25% 0.02 60)"/></svg>
+      <span style="font-size:13px;color:oklch(50% 0.02 60);font-weight:600;">rolled 8</span>
+    </div>
+  </div>
+
+  <div style="flex:1;min-height:0;display:flex;">
+
+    <div style="width:250px;flex-shrink:0;box-sizing:border-box;padding:20px;border-right:1px solid oklch(88% 0.02 75);background:oklch(95% 0.015 85);display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:4px;">Players</div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:oklch(93% 0.05 85);">
+        <div style="width:32px;height:32px;border-radius:50%;background:oklch(52% 0.16 35);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fdf8ee;font-weight:700;font-size:13px;">Y</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">You</div>
+          <div style="font-size:12px;color:oklch(45% 0.02 60);">7 cards</div>
+        </div>
+        <div style="width:26px;height:26px;border-radius:50%;background:oklch(75% 0.13 85);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:oklch(25% 0.02 60);">3</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:oklch(50% 0.14 250);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fdf8ee;font-weight:700;font-size:13px;">P</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Priya</div>
+          <div style="font-size:12px;color:oklch(45% 0.02 60);">5 cards</div>
+        </div>
+        <div style="width:26px;height:26px;border-radius:50%;background:oklch(90% 0.01 85);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:oklch(25% 0.02 60);">4</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:oklch(65% 0.15 55);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.02 60);font-weight:700;font-size:13px;">J</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Jordan</div>
+          <div style="font-size:12px;color:oklch(45% 0.02 60);">9 cards</div>
+        </div>
+        <div style="width:26px;height:26px;border-radius:50%;background:oklch(90% 0.01 85);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:oklch(25% 0.02 60);">2</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:oklch(92% 0.01 85);border:2px solid oklch(70% 0.02 70);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.02 60);font-weight:700;font-size:13px;">S</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Sam</div>
+          <div style="font-size:12px;color:oklch(45% 0.02 60);">4 cards</div>
+        </div>
+        <div style="width:26px;height:26px;border-radius:50%;background:oklch(90% 0.01 85);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:oklch(25% 0.02 60);">5</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:20px;">
+      <svg width="560" height="520" viewBox="0 0 560 520">
+        <sc-for list="{{hexes}}" as="hex" hint-placeholder-count="19">
+          <polygon points="{{hex.points}}" fill="{{hex.fill}}" stroke="oklch(30% 0.02 60 / 0.35)" stroke-width="2"></polygon>
+          <text x="{{hex.cx}}" y="{{hex.labelY}}" text-anchor="middle" dominant-baseline="central" font-family="Karla, sans-serif" font-size="9" font-weight="600" fill="{{hex.textColor}}">{{hex.terrainLabel}}</text>
+          <sc-if value="{{hex.isDesert}}" hint-placeholder-val="{{false}}">
+            <circle cx="{{hex.cx}}" cy="{{hex.cy}}" r="11" fill="oklch(25% 0.02 60)"></circle>
+            <rect x="{{hex.robberX}}" y="{{hex.robberY}}" width="6" height="12" rx="3" fill="oklch(85% 0.05 85)"></rect>
+          </sc-if>
+          <sc-if value="{{hex.number}}" hint-placeholder-val="{{5}}">
+            <circle cx="{{hex.cx}}" cy="{{hex.cy}}" r="15" fill="oklch(97% 0.01 85)" stroke="oklch(70% 0.03 70)" stroke-width="1"></circle>
+            <text x="{{hex.cx}}" y="{{hex.cy}}" text-anchor="middle" dominant-baseline="central" font-family="Karla, sans-serif" font-size="14" fill="{{hex.numberColor}}" font-weight="{{hex.numberWeight}}">{{hex.number}}</text>
+          </sc-if>
+        </sc-for>
+      </svg>
+    </div>
+
+    <div style="width:300px;flex-shrink:0;box-sizing:border-box;padding:20px;border-left:1px solid oklch(88% 0.02 75);background:oklch(95% 0.015 85);display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.02 60);margin-bottom:2px;">Build</div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:8px;border:1px solid oklch(85% 0.03 70);background:oklch(99% 0.008 85);">
+        <span style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Road</span>
+        <div style="display:flex;gap:6px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(42% 0.06 150);display:inline-block;"></span>1</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(52% 0.16 35);display:inline-block;"></span>1</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:8px;border:1px solid oklch(85% 0.03 70);background:oklch(99% 0.008 85);opacity:0.45;">
+        <span style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Settlement</span>
+        <div style="display:flex;gap:6px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(42% 0.06 150);display:inline-block;"></span>1</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(52% 0.16 35);display:inline-block;"></span>1</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(75% 0.13 85);display:inline-block;"></span>1</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(70% 0.10 140);display:inline-block;"></span>1</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:8px;border:1px solid oklch(85% 0.03 70);background:oklch(99% 0.008 85);">
+        <span style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">City</span>
+        <div style="display:flex;gap:6px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(75% 0.13 85);display:inline-block;"></span>2</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(55% 0.02 250);display:inline-block;"></span>3</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:8px;border:1px solid oklch(85% 0.03 70);background:oklch(99% 0.008 85);">
+        <span style="font-weight:700;font-size:14px;color:oklch(25% 0.02 60);">Dev Card</span>
+        <div style="display:flex;gap:6px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(75% 0.13 85);display:inline-block;"></span>1</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(70% 0.10 140);display:inline-block;"></span>1</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.02 60);"><span style="width:9px;height:9px;border-radius:50%;background:oklch(55% 0.02 250);display:inline-block;"></span>1</span>
+        </div>
+      </div>
+
+      <button style="margin-top:4px;width:100%;padding:12px;border-radius:8px;border:2px solid oklch(52% 0.16 35);background:transparent;color:oklch(52% 0.16 35);font-weight:700;font-size:14px;font-family:'Karla',sans-serif;cursor:pointer;">Propose Trade</button>
+
+      <div style="flex:1;"></div>
+
+      <button style="width:100%;padding:14px;border-radius:8px;border:none;background:oklch(52% 0.16 35);color:#fdf8ee;font-weight:700;font-size:15px;font-family:'Karla',sans-serif;cursor:pointer;">End Turn</button>
+    </div>
+
+  </div>
+
+  <div style="flex-shrink:0;height:88px;border-top:1px solid oklch(88% 0.02 75);background:oklch(99% 0.008 85);display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.02 60);">Your resources</span>
+      <div style="display:flex;gap:10px;">
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:oklch(97% 0.015 85);border:1px solid oklch(85% 0.03 70);">
+          <span style="width:12px;height:12px;border-radius:50%;background:oklch(42% 0.06 150);display:inline-block;"></span>
+          <span style="font-weight:700;font-size:13px;color:oklch(25% 0.02 60);">3</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:oklch(97% 0.015 85);border:1px solid oklch(85% 0.03 70);">
+          <span style="width:12px;height:12px;border-radius:50%;background:oklch(52% 0.16 35);display:inline-block;"></span>
+          <span style="font-weight:700;font-size:13px;color:oklch(25% 0.02 60);">2</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:oklch(97% 0.015 85);border:1px solid oklch(85% 0.03 70);">
+          <span style="width:12px;height:12px;border-radius:50%;background:oklch(70% 0.10 140);display:inline-block;"></span>
+          <span style="font-weight:700;font-size:13px;color:oklch(25% 0.02 60);">0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:oklch(97% 0.015 85);border:1px solid oklch(85% 0.03 70);">
+          <span style="width:12px;height:12px;border-radius:50%;background:oklch(75% 0.13 85);display:inline-block;"></span>
+          <span style="font-weight:700;font-size:13px;color:oklch(25% 0.02 60);">1</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:oklch(97% 0.015 85);border:1px solid oklch(85% 0.03 70);">
+          <span style="width:12px;height:12px;border-radius:50%;background:oklch(55% 0.02 250);display:inline-block;"></span>
+          <span style="font-weight:700;font-size:13px;color:oklch(25% 0.02 60);">1</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:oklch(97% 0.015 85);border:1px solid oklch(85% 0.03 70);">
+          <span style="width:12px;height:12px;border-radius:50%;background:oklch(50% 0.12 300);display:inline-block;"></span>
+          <span style="font-weight:700;font-size:13px;color:oklch(25% 0.02 60);">1 dev card</span>
+        </div>
+      </div>
+    </div>
+
+    <button style="padding:14px 32px;border-radius:8px;border:none;background:oklch(75% 0.13 85);color:oklch(25% 0.02 60);font-weight:700;font-size:15px;font-family:'Karla',sans-serif;cursor:pointer;">Roll Dice</button>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const r = 36;
+    const colors = {
+      wood:   { fill: 'oklch(42% 0.06 150)', text: '#f5efe0' },
+      wheat:  { fill: 'oklch(75% 0.13 85)',  text: '#3a2a12' },
+      sheep:  { fill: 'oklch(70% 0.10 140)', text: '#1f3a1a' },
+      brick:  { fill: 'oklch(52% 0.16 35)',  text: '#f5efe0' },
+      ore:    { fill: 'oklch(55% 0.02 250)', text: '#f5efe0' },
+      desert: { fill: 'oklch(85% 0.05 85)',  text: '#5c4a2e' },
+    };
+    const rows = [
+      [['wood', 5], ['sheep', 2], ['wheat', 6]],
+      [['brick', 3], ['ore', 8], ['wood', 10], ['wheat', 9]],
+      [['sheep', 11], ['brick', 4], ['desert', null], ['wood', 8], ['ore', 11]],
+      [['wheat', 5], ['sheep', 9], ['brick', 10], ['wood', 4]],
+      [['sheep', 3], ['wheat', 6], ['ore', 12]],
+    ];
+    const colSpacing = Math.sqrt(3) * r;
+    const rowSpacing = 1.5 * r;
+    const dx = colSpacing / 2;
+    const cx0 = 280;
+    const cy0 = 260;
+
+    const hexPoints = (cx, cy) => [
+      [0, -r], [dx, -r / 2], [dx, r / 2], [0, r], [-dx, r / 2], [-dx, -r / 2],
+    ].map(([px, py]) => `${cx + px},${cy + py}`).join(' ');
+
+    const hexes = [];
+    rows.forEach((row, ri) => {
+      const n = row.length;
+      const y = cy0 + (ri - 2) * rowSpacing;
+      const startX = cx0 - ((n - 1) / 2) * colSpacing;
+      row.forEach(([terrain, number], ci) => {
+        const x = startX + ci * colSpacing;
+        const c = colors[terrain];
+        const isHot = number === 6 || number === 8;
+        hexes.push({
+          points: hexPoints(x, y),
+          fill: c.fill,
+          textColor: c.text,
+          cx: x,
+          cy: y,
+          labelY: y - 20,
+          robberX: x - 3,
+          robberY: y - 12,
+          number: number,
+          numberColor: isHot ? 'oklch(52% 0.16 35)' : 'oklch(25% 0.02 60)',
+          numberWeight: isHot ? '800' : '600',
+          isDesert: terrain === 'desert',
+          terrainLabel: terrain.charAt(0).toUpperCase() + terrain.slice(1),
+        });
+      });
+    });
+    return { hexes };
+  }
+}
+</script>
+</body>
+</html>

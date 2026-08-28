@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Karla:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(52% 0.16 35); text-decoration: none; font-weight: 600; }
+    a:hover { color: oklch(42% 0.16 35); }
+  </style>
+</helmet>
+
+<div style="width:1280px;height:800px;box-sizing:border-box;background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+
+  <svg width="360" height="416" viewBox="0 0 90 104" style="position:absolute;left:-60px;top:-40px;opacity:0.5;">
+    <path d="M45 2 L88 27 V77 L45 102 L2 77 V27 Z" fill="none" stroke="oklch(85% 0.03 70)" stroke-width="2"/>
+  </svg>
+  <svg width="300" height="346" viewBox="0 0 90 104" style="position:absolute;right:-50px;bottom:-50px;opacity:0.5;">
+    <path d="M45 2 L88 27 V77 L45 102 L2 77 V27 Z" fill="none" stroke="oklch(85% 0.03 70)" stroke-width="2"/>
+  </svg>
+
+  <div style="width:420px;background:oklch(99% 0.008 85);border:1px solid oklch(85% 0.03 70);border-radius:12px;padding:40px;box-shadow:0 1px 2px oklch(30% 0.02 60 / 0.06), 0 8px 20px oklch(30% 0.02 60 / 0.08);display:flex;flex-direction:column;gap:24px;position:relative;">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2 L21 7.5 V16.5 L12 22 L3 16.5 V7.5 Z" fill="oklch(52% 0.16 35)"/>
+        <path d="M12 2 L21 7.5 L12 12 L3 7.5 Z" fill="oklch(75% 0.13 85)"/>
+      </svg>
+      <span style="font-family:'Bitter',serif;font-weight:700;font-size:22px;letter-spacing:0.02em;color:oklch(25% 0.02 60);">CATAN</span>
+    </div>
+
+    <div style="text-align:center;">
+      <h1 style="font-family:'Bitter',serif;margin:0 0 6px;font-size:20px;color:oklch(25% 0.02 60);">Welcome back</h1>
+      <p style="margin:0;color:oklch(45% 0.02 60);font-size:14px;">Log in to join your friends' game.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:oklch(45% 0.02 60);">Username</span>
+        <input value="yash" style="box-sizing:border-box;width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid oklch(85% 0.03 70);font-size:15px;color:oklch(25% 0.02 60);background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:oklch(45% 0.02 60);">Password</span>
+        <input type="password" value="********" style="box-sizing:border-box;width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid oklch(85% 0.03 70);font-size:15px;color:oklch(25% 0.02 60);background:oklch(97% 0.015 85);font-family:'Karla',sans-serif;">
+      </div>
+    </div>
+
+    <button style="width:100%;padding:14px;border-radius:8px;border:none;background:oklch(52% 0.16 35);color:#fdf8ee;font-weight:700;font-size:15px;font-family:'Karla',sans-serif;cursor:pointer;">Log In</button>
+
+    <p style="text-align:center;margin:0;font-size:14px;color:oklch(45% 0.02 60);">Don't have an account? <a href="#">Sign up</a></p>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

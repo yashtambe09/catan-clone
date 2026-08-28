@@ -1,0 +1,22 @@
+{
+  "artboards": [
+    { "file": "Login.dc.html", "x": 0, "y": 0, "w": 1280, "h": 800, "page": "screens" },
+    { "file": "Signup.dc.html", "x": 1380, "y": 0, "w": 1280, "h": 800, "page": "screens" },
+    { "file": "Main.dc.html", "x": 2760, "y": 0, "w": 1280, "h": 800, "page": "screens" },
+    { "file": "GameScreen.dc.html", "x": 4140, "y": 0, "w": 1440, "h": 900, "page": "screens" },
+    { "file": "Stats.dc.html", "x": 5680, "y": 0, "w": 1280, "h": 860, "page": "screens" },
+    { "file": "Components.dc.html", "x": 0, "y": 0, "w": 1280, "h": 1820, "page": "components" }
+  ],
+  "annotations": [
+    { "id": "note-login", "x": 0, "y": -70, "w": 300, "text": "Log in", "page": "screens" },
+    { "id": "note-signup", "x": 1380, "y": -70, "w": 300, "text": "Sign up (with a validation-error state)", "page": "screens" },
+    { "id": "note-lobby", "x": 2760, "y": -70, "w": 300, "text": "Lobby — create or join a room", "page": "screens" },
+    { "id": "note-game", "x": 4140, "y": -70, "w": 400, "text": "Main game screen — board, players, build/trade, resources", "page": "screens" },
+    { "id": "note-stats", "x": 5680, "y": -70, "w": 300, "text": "Career / stats page", "page": "screens" }
+  ],
+  "pages": [
+    { "id": "screens", "name": "Screens" },
+    { "id": "components", "name": "Components" }
+  ],
+  "launch": { "view": "canvas", "page": "screens" }
+}
