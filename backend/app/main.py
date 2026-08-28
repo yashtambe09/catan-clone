@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth import router as auth_router
+from app.board_api import router as board_router
 from app.db import create_pool
 
 
@@ -26,6 +27,7 @@ fastapi_app.add_middleware(
 )
 
 fastapi_app.include_router(auth_router)
+fastapi_app.include_router(board_router)
 
 
 @fastapi_app.get("/health")
