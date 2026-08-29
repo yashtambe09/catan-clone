@@ -1,0 +1,59 @@
+:root {
+  /* Core UI colors */
+  --color-bg: oklch(97% 0.015 85);
+  --color-surface: oklch(99% 0.008 85);
+  --color-ink: oklch(25% 0.02 60);
+  --color-muted: oklch(45% 0.02 60);
+  --color-border: oklch(85% 0.03 70);
+  --color-border-soft: oklch(88% 0.02 75);
+  --color-accent: oklch(52% 0.16 35);
+  --color-accent-hover: oklch(42% 0.16 35);
+  --color-error: oklch(50% 0.19 15);
+  --color-on-accent: #fdf8ee;
+
+  --color-disabled-bg: oklch(90% 0.01 80);
+  --color-disabled-text: oklch(60% 0.01 80);
+
+  --color-success: oklch(58% 0.13 145);
+  --color-success-bg: oklch(58% 0.13 145 / 0.16);
+  --color-success-text: oklch(40% 0.13 145);
+  --color-loss-bg: oklch(45% 0.02 60 / 0.1);
+
+  /* Resources (shared between UI chips and the board) */
+  --resource-wood: oklch(42% 0.06 150);
+  --resource-brick: oklch(52% 0.16 35);
+  --resource-sheep: oklch(70% 0.10 140);
+  --resource-wheat: oklch(75% 0.13 85);
+  --resource-ore: oklch(55% 0.02 250);
+  --resource-devcard: oklch(50% 0.12 300);
+
+  /* Player colors (classic Catan colors, oklch) */
+  --player-red: oklch(52% 0.16 35);
+  --player-blue: oklch(50% 0.14 250);
+  --player-orange: oklch(65% 0.15 55);
+  --player-cream: oklch(92% 0.01 85);
+  --player-green: oklch(50% 0.13 155);
+  --player-brown: oklch(38% 0.07 50);
+
+  /* Typography */
+  --font-heading: 'Bitter', serif;
+  --font-body: 'Karla', sans-serif;
+
+  --text-h1-size: 32px;
+  --text-h1-weight: 700;
+  --text-h2-size: 22px;
+  --text-h2-weight: 700;
+  --text-body-size: 16px;
+  --text-body-weight: 400;
+  --text-emphasis-size: 14px;
+  --text-emphasis-weight: 600;
+  --text-eyebrow-size: 12px;
+  --text-eyebrow-weight: 700;
+  --text-eyebrow-tracking: 0.06em;
+
+  /* Spacing / radius / shadow */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --shadow-card: 0 1px 2px oklch(30% 0.02 60 / 0.06), 0 8px 20px oklch(30% 0.02 60 / 0.08);
+}

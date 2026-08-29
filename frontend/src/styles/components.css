@@ -1,0 +1,220 @@
+/* Buttons */
+.btn {
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: var(--text-emphasis-weight);
+  font-size: 14px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.btn-secondary {
+  border: 2px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+  padding: 10px 20px;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-accent);
+}
+
+.btn-destructive {
+  background: var(--color-error);
+  color: var(--color-on-accent);
+}
+
+.btn:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.btn-block {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+}
+
+/* Inputs */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: var(--text-eyebrow-size);
+  font-weight: var(--text-eyebrow-weight);
+  letter-spacing: var(--text-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border);
+  font-size: 15px;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.input.is-error {
+  border-color: var(--color-error);
+}
+
+.input:disabled {
+  border-color: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  background: oklch(93% 0.01 80);
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--color-error);
+  font-weight: var(--text-emphasis-weight);
+}
+
+/* Chips (selector chips, e.g. player-count picker) */
+.chip {
+  min-width: 44px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--text-emphasis-weight);
+  color: var(--color-muted);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.chip.is-selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.chip:disabled {
+  border-color: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: var(--text-emphasis-weight);
+  font-size: 12px;
+}
+
+.badge-win {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.badge-loss {
+  background: var(--color-loss-bg);
+  color: var(--color-muted);
+}
+
+.badge-turn {
+  background: var(--resource-wheat);
+  color: var(--color-ink);
+}
+
+/* Avatar */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-on-accent);
+  font-weight: var(--text-emphasis-weight);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+/* Card */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.card-shadow {
+  box-shadow: var(--shadow-card);
+}
+
+.eyebrow {
+  font-size: var(--text-eyebrow-size);
+  font-weight: var(--text-eyebrow-weight);
+  letter-spacing: var(--text-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Animations */
+@keyframes dice-roll {
+  0% { transform: rotate(0deg) scale(1); }
+  30% { transform: rotate(-18deg) scale(1.08); }
+  60% { transform: rotate(14deg) scale(1.08); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.dice-roll-anim {
+  animation: dice-roll 0.5s ease-out;
+}
+
+@keyframes resource-flash {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 oklch(58% 0.13 145 / 0.5); }
+  40% { transform: scale(1.15); box-shadow: 0 0 0 6px oklch(58% 0.13 145 / 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 oklch(58% 0.13 145 / 0); }
+}
+
+.resource-flash {
+  animation: resource-flash 0.6s ease-out;
+}
+
+@keyframes float-up-fade {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-18px); opacity: 0; }
+}
+
+.float-up-fade {
+  animation: float-up-fade 0.6s ease-out forwards;
+}

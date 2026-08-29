@@ -13,6 +13,7 @@ from app.auth import router as auth_router
 from app.db import create_pool
 from app.game.placement import GameError
 from app.rooms import Room, RoomError, RoomManager
+from app.stats import router as stats_router
 
 
 @asynccontextmanager
@@ -33,6 +34,7 @@ fastapi_app.add_middleware(
 )
 
 fastapi_app.include_router(auth_router)
+fastapi_app.include_router(stats_router)
 
 
 @fastapi_app.get("/health")

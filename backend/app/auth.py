@@ -5,7 +5,7 @@ import asyncpg
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -61,6 +61,16 @@ def decode_access_token(token: str) -> dict:
         raise AuthError("invalid_token", "invalid auth token")
 
     return {"user_id": user_id, "username": username}
+
+
+async def get_current_user(authorization: str | None = Header(default=None)) -> dict:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="missing or malformed Authorization header")
+    token = authorization.removeprefix("Bearer ").strip()
+    try:
+        return decode_access_token(token)
+    except AuthError as exc:
+        raise HTTPException(status_code=401, detail=exc.message)
 
 
 def create_access_token(user_id: int, username: str) -> str:
