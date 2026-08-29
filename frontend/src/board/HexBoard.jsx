@@ -1,34 +1,8 @@
-import { useEffect, useState } from 'react'
 import { axialToPixel, hexCorners } from './hexMath'
 
 const HEX_SIZE = 50
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
-function HexBoard({ playerCount }) {
-  const [board, setBoard] = useState(null)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    setBoard(null)
-    setError(null)
-
-    const controller = new AbortController()
-    fetch(`${BACKEND_URL}/board?player_count=${playerCount}`, { signal: controller.signal })
-      .then((res) => {
-        if (!res.ok) throw new Error(`request failed: ${res.status}`)
-        return res.json()
-      })
-      .then(setBoard)
-      .catch((err) => {
-        if (err.name !== 'AbortError') setError(err.message)
-      })
-
-    return () => controller.abort()
-  }, [playerCount])
-
-  if (error) return <p>Failed to load board: {error}</p>
-  if (!board) return <p>Loading board...</p>
-
+function HexBoard({ board }) {
   const centers = board.hexes.map((hex) => {
     const [q, r] = hex.coord
     return { hex, ...axialToPixel(q, r, HEX_SIZE) }
