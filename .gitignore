@@ -17,8 +17,7 @@ pgdata/
 backups/
 
 # Claude Code tooling (installed Day 14 — see decisions.md)
-graph.json
-GRAPH_REPORT.md
+graphify-out/
 .claude-mem/
 
 # OS

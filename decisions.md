@@ -93,13 +93,11 @@ game_players (
 - **Update mechanism:** Graphify doesn't auto-watch (unlike Code Review Graph), so refresh via a **git post-commit hook** running `graphify update` — this naturally fires whenever a commit lands, rather than a rigid twice-daily cron.
 - `.gitignore`: `graph.json`, `GRAPH_REPORT.md` (derived data, not versioned).
 
-### claude-mem (persistent memory)
-- Installed alongside Graphify (~Day 14).
-- Hooks into session lifecycle, stores compressed observations in local SQLite (`~/.claude-mem/`), layered retrieval (lightweight summary first, deeper context on demand).
-- Pairs with, does not replace, CLAUDE.md: CLAUDE.md = static project context; claude-mem = dynamic/decision context.
-- **Do not run both claude-mem and a Letta-based "Subconscious" agent simultaneously** — one memory tool per project.
-- `.gitignore`: claude-mem's local storage directory.
-- Claude Code's built-in **Auto Memory** (writes its own MEMORY.md) is on by default since v2.1.59 and can cover early scaffold days before claude-mem is installed.
+### claude-mem (persistent memory) — evaluated, rejected
+- Considered alongside Graphify (~Day 14), **not installed**.
+- Its installer's memory-provider step offers four options: its own hosted "CMEM Pro" ($30/mo after a 14-day trial), an OpenRouter key, a Gemini key, or "use your Anthropic plan" — the last of which bills against whatever Claude Code account is authenticated in the terminal running it. That account is BETSOL's, not a personal one, and the quoted rate (~$58.91/1k observations, the default Haiku path) is the most expensive of the four. Spending company-billed usage on a personal side project isn't worth it, and the cheaper options still cost real money against a personal key for a hobby project.
+- **CLAUDE.md remains the sole persistent-context mechanism** — no dynamic/session memory layer sits alongside it. Keep CLAUDE.md itself current rather than assuming another layer covers gaps.
+- Claude Code's built-in **Auto Memory** (writes its own MEMORY.md) is on by default since v2.1.59 and still applies regardless of this decision.
 
 ---
 

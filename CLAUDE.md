@@ -29,10 +29,20 @@ Real-time multiplayer Catan clone. Full context lives in `decisions.md` (archite
 
 `flow.md` specifies a suggested model (Sonnet/Opus) and effort level per day. Default to what's specified there; override only if a given day's task proves clearly harder or easier than its listed effort suggests.
 
-## 5. Planned Tooling (Not Yet Active)
+## 5. Tooling Status
 
-**Graphify** and **claude-mem** are scheduled for installation on **Day 14** (per `flow.md`), alongside a git post-commit hook (`graphify update`). Do not assume either is installed or configured before then.
+**Graphify** is installed and active (see its own rules section below). **claude-mem was deliberately NOT installed** — every provider option it offered either bills a personal API key or draws on the Claude Code account authenticated in this terminal, which is BETSOL's, not a personal one; not worth spending company usage on a personal side project. **CLAUDE.md is the sole persistent-context mechanism for this project** — there is no dynamic/session memory layer alongside it, so keep this file honest and current rather than assuming something else is filling gaps.
 
 ## 6. Full Context
 
 For anything not covered above — scope, schema, hosting plan, tooling rationale, open decisions — see [`decisions.md`](decisions.md) and [`flow.md`](flow.md).
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
