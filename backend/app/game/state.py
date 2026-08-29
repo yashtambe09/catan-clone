@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 RESOURCES = ("wood", "brick", "sheep", "wheat", "ore")
+DEV_CARDS = ("knight", "victory_point", "monopoly", "road_building", "year_of_plenty")
 
 
 class Phase(str, Enum):
@@ -12,6 +13,10 @@ class Phase(str, Enum):
     DISCARD = "discard"
     MOVE_ROBBER = "move_robber"
     BUILD = "build"
+
+
+def _empty_dev_counts() -> dict:
+    return {c: 0 for c in DEV_CARDS}
 
 
 @dataclass
@@ -25,12 +30,19 @@ class PlayerState:
     cities_left: int = 4
     roads_left: int = 15
     connected: bool = True
+    dev_cards: dict = field(default_factory=_empty_dev_counts)
+    dev_new: dict = field(default_factory=_empty_dev_counts)
+    dev_played: dict = field(default_factory=_empty_dev_counts)
+    knights_played: int = 0
 
     def hand_size(self) -> int:
         return sum(self.resources.values())
 
-    def to_dict(self) -> dict:
-        return {
+    def dev_card_count(self) -> int:
+        return sum(self.dev_cards.values()) + sum(self.dev_new.values())
+
+    def to_dict(self, private: bool = False) -> dict:
+        d = {
             "name": self.name,
             "resources": dict(self.resources),
             "settlements": sorted(self.settlements),
@@ -38,6 +50,33 @@ class PlayerState:
             "roads": sorted(self.roads),
             "victory_points": len(self.settlements) + 2 * len(self.cities),
             "connected": self.connected,
+            "dev_card_count": self.dev_card_count(),
+            "dev_played": dict(self.dev_played),
+            "knights_played": self.knights_played,
+        }
+        if private:
+            d["dev_cards"] = dict(self.dev_cards)
+            d["dev_new"] = dict(self.dev_new)
+        return d
+
+
+@dataclass
+class TradeOffer:
+    offer_id: int
+    proposer: str
+    give: dict
+    want: dict
+    target: str | None = None
+    rejected_by: set = field(default_factory=set)
+
+    def to_dict(self) -> dict:
+        return {
+            "offer_id": self.offer_id,
+            "proposer": self.proposer,
+            "give": dict(self.give),
+            "want": dict(self.want),
+            "target": self.target,
+            "rejected_by": sorted(self.rejected_by),
         }
 
 
@@ -53,6 +92,9 @@ class GameState:
     last_roll: tuple | None = None
     pending_discards: dict = field(default_factory=dict)
     turn_number: int = 1
+    dev_deck: list = field(default_factory=list)
+    trade: TradeOffer | None = None
+    next_offer_id: int = 1
 
     def current_player(self) -> str:
         n = len(self.order)
@@ -62,14 +104,18 @@ class GameState:
             return self.order[2 * n - 1 - self.setup_index]
         return self.order[self.current_index]
 
-    def to_dict(self, legal: dict | None = None) -> dict:
+    def to_dict(self, legal: dict | None = None, viewer: str | None = None) -> dict:
         return {
             "order": list(self.order),
-            "players": {name: p.to_dict() for name, p in self.players.items()},
+            "players": {
+                name: p.to_dict(private=(name == viewer)) for name, p in self.players.items()
+            },
             "phase": self.phase.value,
             "current_player": self.current_player(),
             "last_roll": list(self.last_roll) if self.last_roll else None,
             "pending_discards": dict(self.pending_discards),
             "turn_number": self.turn_number,
-            "legal": legal or {"vertices": [], "edges": []},
+            "dev_cards_remaining": len(self.dev_deck),
+            "trade": self.trade.to_dict() if self.trade else None,
+            "legal": legal or {"vertices": [], "edges": [], "bank_ratios": {}},
         }

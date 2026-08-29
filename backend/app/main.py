@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.auth import router as auth_router
 from app.db import create_pool
 from app.game.placement import GameError
-from app.rooms import RoomError, RoomManager
+from app.rooms import Room, RoomError, RoomManager
 
 
 @asynccontextmanager
@@ -53,6 +53,12 @@ def room_handler(fn):
     return wrapper
 
 
+async def broadcast(room: Room, event: str):
+    for p in room.players:
+        if p.connected:
+            await sio.emit(event, room.to_dict(viewer=p.name), to=p.sid)
+
+
 @sio.event
 async def connect(sid, environ):
     print(f"client connected: {sid}")
@@ -63,7 +69,7 @@ async def disconnect(sid):
     print(f"client disconnected: {sid}")
     room = room_manager.remove_player(sid)
     if room is not None:
-        await sio.emit("room_updated", room.to_dict(), room=room.code)
+        await broadcast(room, "room_updated")
 
 
 @sio.event
@@ -71,7 +77,7 @@ async def disconnect(sid):
 async def create_room(sid, data):
     room = room_manager.create_room(sid, data.get("name"), data.get("player_count"))
     await sio.enter_room(sid, room.code)
-    return {"room": room.to_dict()}
+    return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
 
 
 @sio.event
@@ -79,24 +85,24 @@ async def create_room(sid, data):
 async def join_room(sid, data):
     room = room_manager.join_room(sid, data.get("code"), data.get("name"))
     await sio.enter_room(sid, room.code)
-    await sio.emit("room_updated", room.to_dict(), room=room.code)
-    return {"room": room.to_dict()}
+    await broadcast(room, "room_updated")
+    return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
 
 
 @sio.event
 @room_handler
 async def start_game(sid, data):
     room = room_manager.start_game(sid)
-    await sio.emit("game_started", room.to_dict(), room=room.code)
-    return {"room": room.to_dict()}
+    await broadcast(room, "game_started")
+    return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
 
 
 @sio.event
 @room_handler
 async def game_action(sid, data):
     room = room_manager.game_action(sid, data.get("action"), data.get("payload"))
-    await sio.emit("game_updated", room.to_dict(), room=room.code)
-    return {"room": room.to_dict()}
+    await broadcast(room, "game_updated")
+    return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
 
 
 app = socketio.ASGIApp(sio, other_asgi_app=fastapi_app)

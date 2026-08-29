@@ -42,20 +42,21 @@ class Room:
     topology: Topology | None = None
     game: GameState | None = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self, viewer: str | None = None) -> dict:
         return {
             "code": self.code,
             "max_players": self.max_players,
             "players": [p.to_dict() for p in self.players],
             "phase": self.phase,
             "board": self.board.model_dump(mode="json") if self.board else None,
-            "game": self._game_dict(),
+            "game": self._game_dict(viewer),
         }
 
-    def _game_dict(self) -> dict | None:
+    def _game_dict(self, viewer: str | None) -> dict | None:
         if self.game is None:
             return None
-        return self.game.to_dict(legal=engine.legal_moves(self.topology, self.game))
+        legal = engine.legal_moves(self.board, self.topology, self.game)
+        return self.game.to_dict(legal=legal, viewer=viewer)
 
 
 def _validate_name(name: str) -> str:
@@ -106,6 +107,46 @@ def _action_end_turn(room: Room, name: str, payload: dict):
     engine.end_turn(room.board, room.topology, room.game, name)
 
 
+def _action_bank_trade(room: Room, name: str, payload: dict):
+    engine.bank_trade(
+        room.board, room.topology, room.game, name,
+        payload.get("give"), payload.get("want"), payload.get("count", 1),
+    )
+
+
+def _action_trade_propose(room: Room, name: str, payload: dict):
+    engine.trade_propose(
+        room.game, name, payload.get("give") or {}, payload.get("want") or {}, payload.get("target")
+    )
+
+
+def _action_trade_counter(room: Room, name: str, payload: dict):
+    engine.trade_counter(room.game, name, payload.get("give") or {}, payload.get("want") or {})
+
+
+def _action_trade_accept(room: Room, name: str, payload: dict):
+    engine.trade_accept(room.game, name)
+
+
+def _action_trade_reject(room: Room, name: str, payload: dict):
+    engine.trade_reject(room.game, name)
+
+
+def _action_trade_cancel(room: Room, name: str, payload: dict):
+    engine.trade_cancel(room.game, name)
+
+
+def _action_buy_dev_card(room: Room, name: str, payload: dict):
+    engine.buy_dev_card(room.board, room.topology, room.game, name)
+
+
+def _action_play_knight(room: Room, name: str, payload: dict):
+    from app.game.coords import Axial
+
+    q, r = payload.get("hex", (None, None))
+    engine.play_knight(room.board, room.topology, room.game, name, Axial(q, r), payload.get("steal_from"))
+
+
 _GAME_ACTIONS = {
     "setup_settlement": _action_setup_settlement,
     "setup_road": _action_setup_road,
@@ -116,6 +157,14 @@ _GAME_ACTIONS = {
     "build_road": _action_build_road,
     "build_city": _action_build_city,
     "end_turn": _action_end_turn,
+    "bank_trade": _action_bank_trade,
+    "trade_propose": _action_trade_propose,
+    "trade_counter": _action_trade_counter,
+    "trade_accept": _action_trade_accept,
+    "trade_reject": _action_trade_reject,
+    "trade_cancel": _action_trade_cancel,
+    "buy_dev_card": _action_buy_dev_card,
+    "play_knight": _action_play_knight,
 }
 
 
@@ -137,6 +186,14 @@ class RoomManager:
         if room is None:
             raise RoomError("not_found", "you are not in a room")
         return room
+
+    def name_for_sid(self, sid: str) -> str | None:
+        code = self.sid_to_code.get(sid)
+        room = self.rooms.get(code) if code else None
+        if room is None:
+            return None
+        player = next((p for p in room.players if p.sid == sid), None)
+        return player.name if player else None
 
     def create_room(self, sid: str, name: str, player_count: int) -> Room:
         name = _validate_name(name)
@@ -211,9 +268,16 @@ class RoomManager:
             return None
 
         if room.phase == "in_game":
+            leaver_name = None
             for p in room.players:
                 if p.sid == sid:
                     p.connected = False
+                    leaver_name = p.name
+            if room.game and room.game.trade and leaver_name in (
+                room.game.trade.proposer,
+                room.game.trade.target,
+            ):
+                room.game.trade = None
             return room
 
         was_host = any(p.sid == sid and p.is_host for p in room.players)

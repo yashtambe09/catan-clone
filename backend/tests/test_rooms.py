@@ -180,3 +180,57 @@ def test_room_to_dict_includes_serialized_board_after_start(manager):
     assert payload["phase"] == "in_game"
     assert payload["board"]["player_count"] == 2
     assert len(payload["board"]["hexes"]) == 19
+
+
+def _start_two_player_game(manager):
+    from app.game.state import Phase
+
+    room = manager.create_room("sid-1", "Alice", 2)
+    manager.join_room("sid-2", room.code, "Bob")
+    room = manager.start_game("sid-1")
+    room.game.phase = Phase.BUILD
+    room.game.current_index = room.game.order.index("Alice")
+    return room
+
+
+def test_to_dict_hides_other_players_dev_cards(manager):
+    room = _start_two_player_game(manager)
+    room.game.players["Alice"].dev_cards["knight"] = 1
+
+    alice_view = room.to_dict(viewer="Alice")
+    bob_view = room.to_dict(viewer="Bob")
+
+    assert "dev_cards" in alice_view["game"]["players"]["Alice"]
+    assert "dev_cards" not in bob_view["game"]["players"]["Alice"]
+    assert bob_view["game"]["players"]["Alice"]["dev_card_count"] == 1
+
+
+def test_trade_cleared_when_proposer_disconnects(manager):
+    room = _start_two_player_game(manager)
+    room.game.players["Alice"].resources["wood"] = 1
+
+    from app.game import engine
+
+    engine.trade_propose(room.game, "Alice", {"wood": 1}, {"brick": 1})
+    assert room.game.trade is not None
+
+    manager.remove_player("sid-1")
+    assert room.game.trade is None
+    assert room.players[0].connected is False
+
+
+def test_bank_trade_dispatches_through_game_action(manager):
+    room = _start_two_player_game(manager)
+    room.game.players["Alice"].resources["wood"] = 4
+
+    updated = manager.game_action("sid-1", "bank_trade", {"give": "wood", "want": "brick"})
+    assert updated.game.players["Alice"].resources["wood"] == 0
+    assert updated.game.players["Alice"].resources["brick"] == 1
+
+
+def test_buy_dev_card_dispatches_through_game_action(manager):
+    room = _start_two_player_game(manager)
+    room.game.players["Alice"].resources.update({"wheat": 1, "sheep": 1, "ore": 1})
+
+    updated = manager.game_action("sid-1", "buy_dev_card", {})
+    assert updated.game.players["Alice"].dev_card_count() == 1

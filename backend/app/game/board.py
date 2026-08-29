@@ -5,6 +5,7 @@ from typing import NamedTuple
 from pydantic import BaseModel
 
 from app.game.coords import Axial, Bounds, hexes_in_bounds, neighbors
+from app.game.ports import Port, generate_ports
 from app.game.topology import Topology
 
 
@@ -42,6 +43,7 @@ class BoardSpec(NamedTuple):
     bounds: Bounds
     terrain_counts: dict[Terrain, int]
     tokens: tuple[int, ...]
+    port_generics: int
 
 
 BOARD_SPECS = {
@@ -56,6 +58,7 @@ BOARD_SPECS = {
             Terrain.DESERT: 1,
         },
         tokens=(2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12),
+        port_generics=4,
     ),
     BoardSize.EXPANDED: BoardSpec(
         bounds=Bounds(q_min=-3, q_max=2, r_min=-3, r_max=3, s_min=-2, s_max=3),
@@ -79,6 +82,7 @@ BOARD_SPECS = {
             11, 11, 11,
             12, 12,
         ),
+        port_generics=6,
     ),
 }
 
@@ -98,6 +102,7 @@ class Board(BaseModel):
     player_count: int
     hexes: list[Hex]
     robber: Axial
+    ports: list[Port] = []
 
 
 def board_size_for(player_count: int) -> BoardSize:
@@ -213,6 +218,10 @@ def generate_board(player_count: int, seed: int | None = None) -> Board:
 
     deserts = sorted(c for c in coords if terrain[c] is Terrain.DESERT)
 
+    topology = Topology(coords)
+    kinds = [None] * spec.port_generics + list(RESOURCE_BY_TERRAIN.values())
+    ports = generate_ports(topology, kinds, rng)
+
     return Board(
         size=size,
         player_count=player_count,
@@ -221,4 +230,5 @@ def generate_board(player_count: int, seed: int | None = None) -> Board:
             for coord in coords
         ],
         robber=rng.choice(deserts),
+        ports=ports,
     )

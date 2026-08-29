@@ -11,12 +11,21 @@ from app.game.placement import (
     legal_settlement_spots,
     occupied_vertices,
 )
-from app.game.state import GameState, Phase, PlayerState
+from app.game.state import RESOURCES, GameState, Phase, PlayerState, TradeOffer
 
 COSTS = {
     "road": {"wood": 1, "brick": 1},
     "settlement": {"wood": 1, "brick": 1, "wheat": 1, "sheep": 1},
     "city": {"wheat": 2, "ore": 3},
+    "dev_card": {"wheat": 1, "sheep": 1, "ore": 1},
+}
+
+DEV_DECK_COMPOSITION = {
+    "knight": 14,
+    "victory_point": 5,
+    "monopoly": 2,
+    "road_building": 2,
+    "year_of_plenty": 2,
 }
 
 
@@ -43,7 +52,13 @@ def new_game(board: Board, player_names: list, seed: int | None = None) -> GameS
     order = list(player_names)
     rng.shuffle(order)
     players = {name: PlayerState(name=name) for name in order}
-    return GameState(order=order, players=players, rng=rng)
+
+    dev_deck = []
+    for card, count in DEV_DECK_COMPOSITION.items():
+        dev_deck.extend([card] * count)
+    rng.shuffle(dev_deck)
+
+    return GameState(order=order, players=players, rng=rng, dev_deck=dev_deck)
 
 
 def _index(topology) -> TopologyIndex:
@@ -119,6 +134,7 @@ def roll(board: Board, topology, state: GameState, name: str) -> tuple:
     _require_actor(state, name)
     index = _index(topology)
 
+    state.trade = None
     d1, d2 = state.rng.randint(1, 6), state.rng.randint(1, 6)
     state.last_roll = (d1, d2)
     total = d1 + d2
@@ -245,24 +261,215 @@ def end_turn(board: Board, topology, state: GameState, name: str):
     _require_phase(state, Phase.BUILD)
     _require_actor(state, name)
 
+    player = state.players[name]
+    for card, count in player.dev_new.items():
+        if count:
+            player.dev_cards[card] += count
+            player.dev_new[card] = 0
+
+    state.trade = None
     state.current_index = (state.current_index + 1) % len(state.order)
     state.turn_number += 1
     state.phase = Phase.ROLL
 
 
-def legal_moves(topology, state: GameState) -> dict:
+def port_ratios(board: Board, state: GameState, name: str) -> dict:
+    ratios = {r: 4 for r in RESOURCES}
+    owned = state.players[name].settlements | state.players[name].cities
+    for port in board.ports:
+        if not (set(port.vertices) & owned):
+            continue
+        if port.resource is None:
+            for r in ratios:
+                ratios[r] = min(ratios[r], 3)
+        else:
+            ratios[port.resource] = min(ratios[port.resource], 2)
+    return ratios
+
+
+def bank_trade(board: Board, topology, state: GameState, name: str, give: str, want: str, count: int = 1):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+
+    if give not in RESOURCES or want not in RESOURCES:
+        raise GameError("invalid_resource", "unknown resource")
+    if give == want:
+        raise GameError("invalid_trade", "give and want must differ")
+    if not isinstance(count, int) or count < 1:
+        raise GameError("invalid_trade", "count must be a positive integer")
+
+    ratio = port_ratios(board, state, name)[give]
+    player = state.players[name]
+    cost = ratio * count
+    if player.resources.get(give, 0) < cost:
+        raise GameError("insufficient_resources", f"not enough {give}")
+
+    player.resources[give] -= cost
+    player.resources[want] += count
+
+
+def _validate_trade_sides(give: dict, want: dict):
+    if not give or not want:
+        raise GameError("invalid_trade", "give and want cannot be empty")
+    for side in (give, want):
+        for resource, amount in side.items():
+            if resource not in RESOURCES:
+                raise GameError("invalid_trade", "unknown resource")
+            if not isinstance(amount, int) or amount < 1:
+                raise GameError("invalid_trade", "amounts must be positive integers")
+    if set(give) & set(want):
+        raise GameError("invalid_trade", "a resource cannot be on both sides")
+
+
+def _has_resources(player: PlayerState, side: dict) -> bool:
+    return all(player.resources.get(r, 0) >= amount for r, amount in side.items())
+
+
+def trade_propose(state: GameState, name: str, give: dict, want: dict, target: str | None = None):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+    _validate_trade_sides(give, want)
+
+    if target is not None:
+        if target == name:
+            raise GameError("invalid_trade", "cannot trade with yourself")
+        if target not in state.players:
+            raise GameError("invalid_trade", "unknown target player")
+    if not _has_resources(state.players[name], give):
+        raise GameError("insufficient_resources", "you don't have the offered resources")
+
+    state.trade = TradeOffer(
+        offer_id=state.next_offer_id, proposer=name, give=dict(give), want=dict(want), target=target
+    )
+    state.next_offer_id += 1
+
+
+def trade_counter(state: GameState, name: str, give: dict, want: dict):
+    offer = state.trade
+    if offer is None:
+        raise GameError("no_active_trade", "there is no active trade offer")
+    if name == offer.proposer:
+        raise GameError("invalid_trade", "you cannot counter your own offer")
+    if offer.target is not None and offer.target != name:
+        raise GameError("not_eligible", "you are not part of this trade")
+    _validate_trade_sides(give, want)
+    if not _has_resources(state.players[name], give):
+        raise GameError("insufficient_resources", "you don't have the offered resources")
+
+    state.trade = TradeOffer(
+        offer_id=state.next_offer_id, proposer=name, give=dict(give), want=dict(want), target=offer.proposer
+    )
+    state.next_offer_id += 1
+
+
+def trade_accept(state: GameState, name: str):
+    offer = state.trade
+    if offer is None:
+        raise GameError("no_active_trade", "there is no active trade offer")
+    if name == offer.proposer:
+        raise GameError("invalid_trade", "you cannot accept your own offer")
+    if offer.target is not None and offer.target != name:
+        raise GameError("not_eligible", "you are not the target of this trade")
+    if offer.proposer != state.current_player() and name != state.current_player():
+        raise GameError("not_eligible", "one side of the trade must be the current player")
+
+    proposer = state.players[offer.proposer]
+    acceptor = state.players[name]
+    if not _has_resources(proposer, offer.give) or not _has_resources(acceptor, offer.want):
+        state.trade = None
+        raise GameError("insufficient_resources", "a trader no longer has the required resources")
+
+    for resource, amount in offer.give.items():
+        proposer.resources[resource] -= amount
+        acceptor.resources[resource] += amount
+    for resource, amount in offer.want.items():
+        acceptor.resources[resource] -= amount
+        proposer.resources[resource] += amount
+
+    state.trade = None
+
+
+def trade_reject(state: GameState, name: str):
+    offer = state.trade
+    if offer is None:
+        raise GameError("no_active_trade", "there is no active trade offer")
+    if name == offer.proposer:
+        raise GameError("invalid_trade", "use trade_cancel to withdraw your own offer")
+    if offer.target is not None:
+        if offer.target != name:
+            raise GameError("not_eligible", "you are not part of this trade")
+        state.trade = None
+        return
+
+    if name not in state.players:
+        raise GameError("not_eligible", "unknown player")
+    offer.rejected_by.add(name)
+    eligible = set(state.players) - {offer.proposer}
+    if eligible <= offer.rejected_by:
+        state.trade = None
+
+
+def trade_cancel(state: GameState, name: str):
+    offer = state.trade
+    if offer is None:
+        raise GameError("no_active_trade", "there is no active trade offer")
+    if name != offer.proposer:
+        raise GameError("not_eligible", "only the proposer can cancel this trade")
+    state.trade = None
+
+
+def buy_dev_card(board: Board, topology, state: GameState, name: str):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+    if not state.dev_deck:
+        raise GameError("deck_empty", "no development cards left")
+
+    player = state.players[name]
+    pay(player, COSTS["dev_card"])
+    card = state.dev_deck.pop()
+    player.dev_new[card] += 1
+
+
+def play_knight(board: Board, topology, state: GameState, name: str, hex_coord, steal_from: str | None):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+
+    player = state.players[name]
+    if player.dev_cards.get("knight", 0) <= 0:
+        raise GameError("no_such_card", "you have no knight card to play")
+
+    state.phase = Phase.MOVE_ROBBER
+    try:
+        move_robber(board, topology, state, name, hex_coord, steal_from)
+    except GameError:
+        state.phase = Phase.BUILD
+        raise
+
+    player.dev_cards["knight"] -= 1
+    player.dev_played["knight"] += 1
+    player.knights_played += 1
+
+
+def legal_moves(board: Board, topology, state: GameState) -> dict:
     index = _index(topology)
     name = state.current_player()
+    bank_ratios = port_ratios(board, state, name)
     if state.phase is Phase.SETUP_SETTLEMENT:
-        return {"vertices": legal_settlement_spots(index, state, name, setup=True), "edges": []}
+        return {
+            "vertices": legal_settlement_spots(index, state, name, setup=True),
+            "edges": [],
+            "bank_ratios": bank_ratios,
+        }
     if state.phase is Phase.SETUP_ROAD:
         return {
             "vertices": [],
             "edges": legal_road_spots(index, state, name, setup=True, required_vertex=state.setup_last_vertex),
+            "bank_ratios": bank_ratios,
         }
     if state.phase is Phase.BUILD:
         return {
             "vertices": legal_settlement_spots(index, state, name, setup=False),
             "edges": legal_road_spots(index, state, name, setup=False),
+            "bank_ratios": bank_ratios,
         }
-    return {"vertices": [], "edges": []}
+    return {"vertices": [], "edges": [], "bank_ratios": bank_ratios}
