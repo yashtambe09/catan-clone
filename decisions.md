@@ -25,7 +25,7 @@
 - **Frontend:** React + Redux (state management).
 - **Real-time layer:** WebSockets (Socket.io-style rooms for lobby/game session scoping).
 - **Board rendering:** SVG-based (plain functional first on Day 5, styled later in UI phase).
-- **UI component library:** *not yet decided* — deferred to Day 17 (start of UI/UX phase), once the app is functionally real. Candidates discussed: shadcn/ui, Radix UI primitives.
+- **UI component library:** **decided at Day 17 — none.** A full "Rustic Tabletop" design system (oklch color/type tokens, component styles, and mockups for every screen) had already been built in earlier sessions before gameplay logic even existed (`design/*.dc.html`), predating this decision point. Rather than adopting shadcn/ui or Radix on top of it, Day 17 implemented that existing system directly as hand-rolled CSS custom properties (`frontend/src/styles/`) — no component library dependency at all.
 - **Hex-grid math:** consider `react-hexgrid` / `honeycomb-grid` (npm) rather than hand-rolling axial/cube coordinate math from scratch.
 
 ---
@@ -114,8 +114,8 @@ game_players (
 
 ## 8. Open / Deferred Decisions
 
-- **UI component library** — not yet chosen. Revisit at Day 17 (start of UI/UX phase). Candidates: shadcn/ui, Radix UI.
-- **UI design profile / mockups** — planned to use **Claude Design** as a separate tool from this planning/docs work; not yet started.
+- ~~UI component library~~ — **resolved at Day 17**: none, see §2. The Claude Design mockups below made the choice moot.
+- ~~UI design profile / mockups~~ — **done, ahead of schedule**: built via Claude Design in `design/*.dc.html` before gameplay logic existed (commits `ecd0da1`, `db9bb44`), then implemented into real code at Day 17-23.
 - **Exact WebSocket library** (`python-socketio` vs raw `websockets`) — lean python-socketio for built-in room support, confirm at Day 1 scaffold.
 - **Backup off-disk destination** — cloud storage vs external drive vs S3/B2 bucket — not yet chosen, needs deciding before Day 27 (backup cron wiring).
 
