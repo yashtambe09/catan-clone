@@ -79,7 +79,18 @@ function GameScreen({ room, myName, act }) {
       <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
         <PlayerDashboard game={game} myName={myName} />
 
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            minHeight: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            boxSizing: 'border-box',
+          }}
+        >
           <HexBoard
             board={room.board}
             game={game}

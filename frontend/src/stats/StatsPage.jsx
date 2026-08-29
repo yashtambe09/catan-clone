@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { BACKEND_URL } from '../config'
 import { setStats, setStatsError, setStatsLoading } from '../store/statsSlice'
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
 function StatCard({ label, value, color }) {
   return (

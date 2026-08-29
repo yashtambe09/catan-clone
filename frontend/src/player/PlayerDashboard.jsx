@@ -13,6 +13,8 @@ function PlayerDashboard({ game, myName }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
+        minHeight: 0,
+        overflowY: 'auto',
       }}
     >
       <div className="eyebrow" style={{ marginBottom: 4 }}>

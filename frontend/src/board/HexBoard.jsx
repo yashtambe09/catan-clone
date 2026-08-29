@@ -109,7 +109,10 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
 
   return (
     <>
-      <svg viewBox={`${minX} ${minY} ${width} ${height}`} style={{ width: '100%', maxWidth: 720 }}>
+      <svg
+        viewBox={`${minX} ${minY} ${width} ${height}`}
+        style={{ width: '100%', height: '100%', maxWidth: 720, maxHeight: '100%' }}
+      >
         {centers.map(({ hex, x, y }) => {
           const isRobber = hex.coord[0] === robberQ && hex.coord[1] === robberR
           const isHot = hex.number === 6 || hex.number === 8

@@ -56,7 +56,7 @@ function TopNav({ view, onSetView, username, onLogout }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
         <Tab label="Play" active={view === 'play'} onClick={() => onSetView('play')} />
         <Tab label="Stats" active={view === 'stats'} onClick={() => onSetView('stats')} />
-        <div className="avatar" style={{ background: 'var(--color-accent)' }}>
+        <div className="avatar" title={username} style={{ background: 'var(--color-accent)' }}>
           {initial}
         </div>
         <button className="btn btn-ghost" onClick={onLogout} style={{ padding: '6px 10px' }}>

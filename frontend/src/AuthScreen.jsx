@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { BACKEND_URL } from './config'
 import { setAuthError, setCredentials } from './store/authSlice'
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
 function Logo({ size = 34 }) {
   return (

@@ -66,6 +66,14 @@ game_players (
 - **Access control:** Cloudflare Access (email-gated) or a shared-passphrase gate restricting the subdomain to the friend group — decided to add this as a deliberate security layer given the server is internet-exposed and always-on.
 - User has explicitly accepted the tradeoffs of running a personal server exposed to the internet, keeping the laptop on continuously, for this friends-only use case.
 
+### Day 24-25: local load test + LAN playtest prep
+
+- **Load-tested locally at 2, 4, and 6 players** (19-hex and 30-hex boards) via multiple simulated browser sessions. Found and fixed two real bugs: the board `<svg>` was only width-constrained, not height-constrained, so the taller 30-hex board overflowed vertically; and the 6-player sidebar had no `overflow-y`, which would clip on a short laptop screen (both fixed — see `HexBoard.jsx`/`PlayerDashboard.jsx`).
+- **Resource usage under 6-player load** (docker stats, no-stream): backend ~4% CPU / 94.5MB (18% of the 512MB limit), frontend dev server ~26% mem, postgres ~7% mem — comfortable headroom under the configured 512MB-per-service limits.
+- **Reconnect confirmed working**: a disconnected mid-game player rejoining with the same account reattaches their seat and gets a full state resync, with the other player(s) unaffected. (The backend's `--reload` file-watcher kills all live connections and wipes in-memory room state on every code change — expected dev behavior, not a concern for the real always-on deployment.)
+- **Fixed for real LAN reachability** (a friend's device connecting to this machine's LAN IP, not just `localhost`): the frontend's backend-URL fallback now derives from `window.location.hostname` (`frontend/src/config.js`) instead of hardcoding `localhost`, and the backend's CORS (`main.py`) now matches `http://localhost:5173` or `http://<any LAN IPv4>:5173` via a regex instead of a single hardcoded origin.
+- **A real LAN playtest with friends' physical devices was not performed** — that requires devices Claude has no access to. To actually run it: with the Docker stack up, have each friend on the same Wi-Fi/LAN open `http://<this-machine's-LAN-IP>:5173` in their browser (find the IP via `ipconfig` on Windows); no `.env`/config changes are needed beyond what's already fixed above.
+
 ---
 
 ## 5. Reliability / Non-Functional Requirements

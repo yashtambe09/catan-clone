@@ -27,7 +27,9 @@ fastapi_app = FastAPI(title="Catan Clone API", lifespan=lifespan)
 
 fastapi_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    # Matches http://localhost:5173 and http://<any LAN IPv4>:5173 so friends'
+    # devices can reach this over LAN, not just the host machine itself.
+    allow_origin_regex=r"http://(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):5173",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
