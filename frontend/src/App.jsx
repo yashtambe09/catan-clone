@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import GamePanel from './board/GamePanel'
 import HexBoard from './board/HexBoard'
 import { socket } from './socket'
 import { setStatus } from './store/connectionSlice'
@@ -22,12 +23,14 @@ function App() {
     socket.on('disconnect', () => dispatch(setStatus('disconnected')))
     socket.on('room_updated', (updatedRoom) => dispatch(setRoom(updatedRoom)))
     socket.on('game_started', (updatedRoom) => dispatch(setRoom(updatedRoom)))
+    socket.on('game_updated', (updatedRoom) => dispatch(setRoom(updatedRoom)))
 
     return () => {
       socket.off('connect')
       socket.off('disconnect')
       socket.off('room_updated')
       socket.off('game_started')
+      socket.off('game_updated')
       socket.disconnect()
     }
   }, [dispatch])
@@ -69,6 +72,12 @@ function App() {
 
   function handleStart() {
     socket.emit('start_game', {}, (response) => {
+      if (response.error) dispatch(setError(response.message))
+    })
+  }
+
+  function act(action, payload) {
+    socket.emit('game_action', { action, payload }, (response) => {
       if (response.error) dispatch(setError(response.message))
     })
   }
@@ -138,7 +147,12 @@ function App() {
         </div>
       )}
 
-      {room && room.phase === 'in_game' && <HexBoard board={room.board} />}
+      {room && room.phase === 'in_game' && (
+        <div>
+          <HexBoard board={room.board} />
+          {room.game && <GamePanel room={room} myName={myName} act={act} />}
+        </div>
+      )}
     </div>
   )
 }
