@@ -30,6 +30,37 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user_id: int
+    username: str
+
+
+class AuthError(Exception):
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
+def decode_access_token(token: str) -> dict:
+    if not token or not isinstance(token, str):
+        raise AuthError("missing_token", "no auth token provided")
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        raise AuthError("token_expired", "your session has expired, log in again")
+    except jwt.InvalidTokenError:
+        raise AuthError("invalid_token", "invalid auth token")
+
+    try:
+        user_id = int(payload["sub"])
+    except (KeyError, TypeError, ValueError):
+        raise AuthError("invalid_token", "invalid auth token")
+
+    username = payload.get("username")
+    if not isinstance(username, str) or not username:
+        raise AuthError("invalid_token", "invalid auth token")
+
+    return {"user_id": user_id, "username": username}
 
 
 def create_access_token(user_id: int, username: str) -> str:
@@ -58,7 +89,7 @@ async def signup(body: SignupRequest, request: Request):
         except asyncpg.UniqueViolationError:
             raise HTTPException(status_code=409, detail="Username already taken")
     token = create_access_token(row["id"], row["username"])
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=token, user_id=row["id"], username=row["username"])
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -76,4 +107,4 @@ async def login(body: LoginRequest, request: Request):
     except VerifyMismatchError:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     token = create_access_token(row["id"], row["username"])
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=token, user_id=row["id"], username=row["username"])

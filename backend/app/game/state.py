@@ -13,6 +13,7 @@ class Phase(str, Enum):
     DISCARD = "discard"
     MOVE_ROBBER = "move_robber"
     BUILD = "build"
+    GAME_OVER = "game_over"
 
 
 def _empty_dev_counts() -> dict:
@@ -101,10 +102,25 @@ class GameState:
     trade: TradeOffer | None = None
     next_offer_id: int = 1
     longest_road_holder: str | None = None
+    largest_army_holder: str | None = None
+    winner: str | None = None
+
+    def bonus_victory_points(self, name: str) -> int:
+        return (2 if self.longest_road_holder == name else 0) + (
+            2 if self.largest_army_holder == name else 0
+        )
 
     def public_victory_points(self, name: str) -> int:
-        base = self.players[name].base_victory_points()
-        return base + (2 if self.longest_road_holder == name else 0)
+        return self.players[name].base_victory_points() + self.bonus_victory_points(name)
+
+    def true_victory_points(self, name: str) -> int:
+        player = self.players[name]
+        return (
+            player.base_victory_points()
+            + self.bonus_victory_points(name)
+            + player.dev_cards["victory_point"]
+            + player.dev_new["victory_point"]
+        )
 
     def current_player(self) -> str:
         n = len(self.order)
@@ -117,7 +133,9 @@ class GameState:
     def to_dict(self, legal: dict | None = None, viewer: str | None = None) -> dict:
         players = {name: p.to_dict(private=(name == viewer)) for name, p in self.players.items()}
         for name, payload in players.items():
-            payload["victory_points"] = self.public_victory_points(name)
+            payload["victory_points"] = (
+                self.true_victory_points(name) if name == viewer else self.public_victory_points(name)
+            )
 
         return {
             "order": list(self.order),
@@ -130,5 +148,7 @@ class GameState:
             "dev_cards_remaining": len(self.dev_deck),
             "trade": self.trade.to_dict() if self.trade else None,
             "longest_road_holder": self.longest_road_holder,
+            "largest_army_holder": self.largest_army_holder,
+            "winner": self.winner,
             "legal": legal or {"vertices": [], "edges": [], "bank_ratios": {}},
         }

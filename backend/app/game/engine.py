@@ -2,6 +2,7 @@ import random
 
 from app.game.board import RESOURCE_BY_TERRAIN, Board, Terrain
 from app.game.ids import TopologyIndex
+from app.game.largest_army import recompute_largest_army
 from app.game.longest_road import recompute_longest_road
 from app.game.placement import (
     GameError,
@@ -454,6 +455,7 @@ def play_knight(board: Board, topology, state: GameState, name: str, hex_coord, 
     player.dev_cards["knight"] -= 1
     player.dev_played["knight"] += 1
     player.knights_played += 1
+    recompute_largest_army(state)
 
 
 def play_monopoly(board: Board, topology, state: GameState, name: str, resource: str):
@@ -561,3 +563,20 @@ def legal_moves(board: Board, topology, state: GameState) -> dict:
             "bank_ratios": bank_ratios,
         }
     return {"vertices": [], "edges": [], "bank_ratios": bank_ratios}
+
+
+WIN_VICTORY_POINTS = 10
+
+
+def check_win(state: GameState) -> str | None:
+    if state.winner is not None:
+        return state.winner
+
+    for name in state.order:
+        if state.true_victory_points(name) >= WIN_VICTORY_POINTS:
+            state.winner = name
+            state.phase = Phase.GAME_OVER
+            state.trade = None
+            return name
+
+    return None

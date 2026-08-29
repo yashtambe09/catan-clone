@@ -1,26 +1,33 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import AuthScreen from './AuthScreen'
 import GamePanel from './board/GamePanel'
 import HexBoard from './board/HexBoard'
-import { socket } from './socket'
+import { connectWithToken, socket } from './socket'
 import { setStatus } from './store/connectionSlice'
-import { leaveRoom, setError, setMyName, setRoom } from './store/roomSlice'
+import { logout, setAuthError } from './store/authSlice'
+import { leaveRoom, setError, setRoom } from './store/roomSlice'
 
 function App() {
   const dispatch = useDispatch()
+  const { token, username } = useSelector((state) => state.auth)
   const status = useSelector((state) => state.connection.status)
-  const { myName, room, error } = useSelector((state) => state.room)
+  const { room, error } = useSelector((state) => state.room)
 
-  const [createName, setCreateName] = useState('')
   const [createPlayerCount, setCreatePlayerCount] = useState(4)
-  const [joinName, setJoinName] = useState('')
   const [joinCode, setJoinCode] = useState('')
 
   useEffect(() => {
-    socket.connect()
+    if (!token) return undefined
+
+    connectWithToken(token)
 
     socket.on('connect', () => dispatch(setStatus('connected')))
     socket.on('disconnect', () => dispatch(setStatus('disconnected')))
+    socket.on('connect_error', (err) => {
+      dispatch(setAuthError(err.message || 'could not connect - please log in again'))
+      dispatch(logout())
+    })
     socket.on('room_updated', (updatedRoom) => dispatch(setRoom(updatedRoom)))
     socket.on('game_started', (updatedRoom) => dispatch(setRoom(updatedRoom)))
     socket.on('game_updated', (updatedRoom) => dispatch(setRoom(updatedRoom)))
@@ -28,43 +35,42 @@ function App() {
     return () => {
       socket.off('connect')
       socket.off('disconnect')
+      socket.off('connect_error')
       socket.off('room_updated')
       socket.off('game_started')
       socket.off('game_updated')
       socket.disconnect()
     }
-  }, [dispatch])
+  }, [token, dispatch])
 
   useEffect(() => {
     if (status === 'disconnected' && room) {
-      dispatch(setError('Disconnected — rejoin with a new name'))
+      dispatch(setError('Disconnected — rejoin the room'))
       dispatch(leaveRoom())
     }
   }, [status, room, dispatch])
 
+  if (!token) {
+    return <AuthScreen />
+  }
+
   function handleCreate(e) {
     e.preventDefault()
-    socket.emit(
-      'create_room',
-      { name: createName, player_count: Number(createPlayerCount) },
-      (response) => {
-        if (response.error) {
-          dispatch(setError(response.message))
-        } else {
-          dispatch(setMyName(createName.trim()))
-          dispatch(setRoom(response.room))
-        }
-      },
-    )
+    socket.emit('create_room', { player_count: Number(createPlayerCount) }, (response) => {
+      if (response.error) {
+        dispatch(setError(response.message))
+      } else {
+        dispatch(setRoom(response.room))
+      }
+    })
   }
 
   function handleJoin(e) {
     e.preventDefault()
-    socket.emit('join_room', { name: joinName, code: joinCode }, (response) => {
+    socket.emit('join_room', { code: joinCode }, (response) => {
       if (response.error) {
         dispatch(setError(response.message))
       } else {
-        dispatch(setMyName(joinName.trim()))
         dispatch(setRoom(response.room))
       }
     })
@@ -82,12 +88,20 @@ function App() {
     })
   }
 
-  const me = room?.players.find((p) => p.name === myName)
+  function handleLogout() {
+    dispatch(leaveRoom())
+    dispatch(logout())
+  }
+
+  const me = room?.players.find((p) => p.name === username)
 
   return (
     <div>
       <h1>Catan Clone</h1>
-      <p>Socket status: {status}</p>
+      <p>
+        Logged in as {username} — socket status: {status}{' '}
+        <button onClick={handleLogout}>Log out</button>
+      </p>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
@@ -95,11 +109,6 @@ function App() {
         <div>
           <form onSubmit={handleCreate}>
             <h2>Create a room</h2>
-            <input
-              value={createName}
-              onChange={(e) => setCreateName(e.target.value)}
-              placeholder="Your name"
-            />
             <select
               value={createPlayerCount}
               onChange={(e) => setCreatePlayerCount(e.target.value)}
@@ -115,11 +124,6 @@ function App() {
 
           <form onSubmit={handleJoin}>
             <h2>Join a room</h2>
-            <input
-              value={joinName}
-              onChange={(e) => setJoinName(e.target.value)}
-              placeholder="Your name"
-            />
             <input
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
@@ -140,6 +144,7 @@ function App() {
             {room.players.map((player) => (
               <li key={player.name}>
                 {player.name} {player.is_host && '(host)'}
+                {!player.connected && ' [disconnected]'}
               </li>
             ))}
           </ul>
@@ -150,7 +155,7 @@ function App() {
       {room && room.phase === 'in_game' && (
         <div>
           <HexBoard board={room.board} />
-          {room.game && <GamePanel room={room} myName={myName} act={act} />}
+          {room.game && <GamePanel room={room} myName={username} act={act} />}
         </div>
       )}
     </div>

@@ -5,3 +5,8 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 export const socket = io(BACKEND_URL, {
   autoConnect: false,
 })
+
+export function connectWithToken(token) {
+  socket.auth = { token }
+  socket.connect()
+}

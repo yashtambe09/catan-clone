@@ -1,5 +1,6 @@
 import random
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Literal
 
 from app.game import engine
@@ -11,7 +12,6 @@ from app.game.topology import Topology
 CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 CODE_LENGTH = 6
 MAX_CODE_ATTEMPTS = 50
-MAX_NAME_LENGTH = 24
 
 
 class RoomError(Exception):
@@ -21,9 +21,16 @@ class RoomError(Exception):
         self.message = message
 
 
+@dataclass(frozen=True)
+class Identity:
+    user_id: int
+    username: str
+
+
 @dataclass
 class Player:
     sid: str
+    user_id: int
     name: str
     is_host: bool = False
     connected: bool = True
@@ -41,6 +48,8 @@ class Room:
     board: Board | None = None
     topology: Topology | None = None
     game: GameState | None = None
+    started_at: datetime | None = None
+    persisted: bool = False
 
     def to_dict(self, viewer: str | None = None) -> dict:
         return {
@@ -57,15 +66,6 @@ class Room:
             return None
         legal = engine.legal_moves(self.board, self.topology, self.game)
         return self.game.to_dict(legal=legal, viewer=viewer)
-
-
-def _validate_name(name: str) -> str:
-    name = (name or "").strip()
-    if not name:
-        raise RoomError("invalid_name", "name cannot be empty")
-    if len(name) > MAX_NAME_LENGTH:
-        raise RoomError("invalid_name", f"name must be {MAX_NAME_LENGTH} characters or fewer")
-    return name
 
 
 def _action_setup_settlement(room: Room, name: str, payload: dict):
@@ -187,6 +187,16 @@ class RoomManager:
     def __init__(self):
         self.rooms: dict[str, Room] = {}
         self.sid_to_code: dict[str, str] = {}
+        self.sid_to_identity: dict[str, Identity] = {}
+
+    def register_identity(self, sid: str, user_id: int, username: str) -> None:
+        self.sid_to_identity[sid] = Identity(user_id=user_id, username=username)
+
+    def _identity_for_sid(self, sid: str) -> Identity:
+        identity = self.sid_to_identity.get(sid)
+        if identity is None:
+            raise RoomError("not_authenticated", "no verified identity for this connection")
+        return identity
 
     def _generate_code(self) -> str:
         for _ in range(MAX_CODE_ATTEMPTS):
@@ -210,8 +220,8 @@ class RoomManager:
         player = next((p for p in room.players if p.sid == sid), None)
         return player.name if player else None
 
-    def create_room(self, sid: str, name: str, player_count: int) -> Room:
-        name = _validate_name(name)
+    def create_room(self, sid: str, player_count: int) -> Room:
+        identity = self._identity_for_sid(sid)
         if sid in self.sid_to_code:
             raise RoomError("already_in_room", "you are already in a room")
         if not isinstance(player_count, int) or not 2 <= player_count <= 6:
@@ -219,27 +229,39 @@ class RoomManager:
 
         code = self._generate_code()
         room = Room(code=code, max_players=player_count)
-        room.players.append(Player(sid=sid, name=name, is_host=True))
+        room.players.append(
+            Player(sid=sid, user_id=identity.user_id, name=identity.username, is_host=True)
+        )
         self.rooms[code] = room
         self.sid_to_code[sid] = code
         return room
 
-    def join_room(self, sid: str, code: str, name: str) -> Room:
-        name = _validate_name(name)
+    def join_room(self, sid: str, code: str) -> Room:
+        identity = self._identity_for_sid(sid)
         if sid in self.sid_to_code:
             raise RoomError("already_in_room", "you are already in a room")
 
         room = self.rooms.get((code or "").strip().upper())
         if room is None:
             raise RoomError("not_found", "no room with that code")
+
+        existing = next((p for p in room.players if p.user_id == identity.user_id), None)
+        if existing is not None and not existing.connected:
+            existing.sid = sid
+            existing.connected = True
+            if room.game is not None and existing.name in room.game.players:
+                room.game.players[existing.name].connected = True
+            self.sid_to_code[sid] = room.code
+            return room
+        if existing is not None:
+            raise RoomError("already_in_room", "you are already in this room")
+
         if room.phase != "lobby":
             raise RoomError("already_started", "that game has already started")
         if len(room.players) >= room.max_players:
             raise RoomError("room_full", "that room is full")
-        if name.lower() in {p.name.lower() for p in room.players}:
-            raise RoomError("name_taken", "that name is already taken in this room")
 
-        room.players.append(Player(sid=sid, name=name))
+        room.players.append(Player(sid=sid, user_id=identity.user_id, name=identity.username))
         self.sid_to_code[sid] = room.code
         return room
 
@@ -257,6 +279,7 @@ class RoomManager:
         room.topology = topology_for(room.board)
         room.game = engine.new_game(room.board, [p.name for p in room.players])
         room.phase = "in_game"
+        room.started_at = datetime.now(timezone.utc)
         return room
 
     def game_action(self, sid: str, action: str, payload: dict) -> Room:
@@ -272,9 +295,12 @@ class RoomManager:
             raise GameError("unknown_action", f"unknown action: {action}")
 
         handler(room, player.name, payload or {})
+        engine.check_win(room.game)
         return room
 
     def remove_player(self, sid: str) -> Room | None:
+        self.sid_to_identity.pop(sid, None)
+
         code = self.sid_to_code.pop(sid, None)
         if code is None:
             return None
@@ -288,6 +314,8 @@ class RoomManager:
                 if p.sid == sid:
                     p.connected = False
                     leaver_name = p.name
+            if leaver_name and room.game and leaver_name in room.game.players:
+                room.game.players[leaver_name].connected = False
             if room.game and room.game.trade and leaver_name in (
                 room.game.trade.proposer,
                 room.game.trade.target,

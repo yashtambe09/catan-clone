@@ -1,10 +1,14 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 from functools import wraps
 
 import socketio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from socketio.exceptions import ConnectionRefusedError
 
+from app.auth import AuthError, decode_access_token
 from app.auth import router as auth_router
 from app.db import create_pool
 from app.game.placement import GameError
@@ -59,14 +63,61 @@ async def broadcast(room: Room, event: str):
             await sio.emit(event, room.to_dict(viewer=p.name), to=p.sid)
 
 
+async def persist_finished_game(room: Room):
+    game = room.game
+    try:
+        scored = sorted(
+            ((p, game.true_victory_points(p.name)) for p in room.players),
+            key=lambda t: -t[1],
+        )
+        placements = []
+        last_score, last_place = None, 0
+        for i, (_, score) in enumerate(scored, start=1):
+            if score != last_score:
+                last_place, last_score = i, score
+            placements.append(last_place)
+
+        winner = next(p for p in room.players if p.name == game.winner)
+
+        async with fastapi_app.state.db_pool.acquire() as conn:
+            async with conn.transaction():
+                game_id = await conn.fetchval(
+                    "INSERT INTO games (started_at, ended_at, winner_id, player_count, board_size) "
+                    "VALUES ($1, now(), $2, $3, $4) RETURNING id",
+                    room.started_at,
+                    winner.user_id,
+                    len(room.players),
+                    room.board.size.value,
+                )
+                await conn.executemany(
+                    "INSERT INTO game_players (game_id, user_id, final_score, placement) "
+                    "VALUES ($1, $2, $3, $4)",
+                    [
+                        (game_id, p.user_id, score, placement)
+                        for (p, score), placement in zip(scored, placements)
+                    ],
+                )
+    except Exception:
+        logging.exception("failed to persist finished game %s", room.code)
+
+
+def _maybe_persist(room: Room):
+    if room.game is not None and room.game.winner is not None and not room.persisted:
+        room.persisted = True
+        asyncio.create_task(persist_finished_game(room))
+
+
 @sio.event
-async def connect(sid, environ):
-    print(f"client connected: {sid}")
+async def connect(sid, environ, auth):
+    try:
+        identity = decode_access_token((auth or {}).get("token"))
+    except AuthError as exc:
+        raise ConnectionRefusedError(exc.message)
+    room_manager.register_identity(sid, identity["user_id"], identity["username"])
 
 
 @sio.event
 async def disconnect(sid):
-    print(f"client disconnected: {sid}")
     room = room_manager.remove_player(sid)
     if room is not None:
         await broadcast(room, "room_updated")
@@ -75,7 +126,7 @@ async def disconnect(sid):
 @sio.event
 @room_handler
 async def create_room(sid, data):
-    room = room_manager.create_room(sid, data.get("name"), data.get("player_count"))
+    room = room_manager.create_room(sid, data.get("player_count"))
     await sio.enter_room(sid, room.code)
     return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
 
@@ -83,7 +134,7 @@ async def create_room(sid, data):
 @sio.event
 @room_handler
 async def join_room(sid, data):
-    room = room_manager.join_room(sid, data.get("code"), data.get("name"))
+    room = room_manager.join_room(sid, data.get("code"))
     await sio.enter_room(sid, room.code)
     await broadcast(room, "room_updated")
     return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
@@ -102,6 +153,7 @@ async def start_game(sid, data):
 async def game_action(sid, data):
     room = room_manager.game_action(sid, data.get("action"), data.get("payload"))
     await broadcast(room, "game_updated")
+    _maybe_persist(room)
     return {"room": room.to_dict(viewer=room_manager.name_for_sid(sid))}
 
 

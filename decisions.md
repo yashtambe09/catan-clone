@@ -53,6 +53,7 @@ game_players (
 ```
 - `game_players` is the key join table — supports both aggregate stats (wins/losses/win-rate) and richer queries (past-opponent history, "games played with X").
 - `player_count` / `board_size` columns on `games` added so stats can later be filtered/segmented by board size if wanted.
+- **`placement` uses standard competition ranking** ("1224" style): tied final scores share the same rank, and the next distinct score skips the ranks consumed by the tie (e.g. two players tied for 2nd both get `placement=2`, the next player gets `placement=4`, not `3`). Computed in `main.py`'s `persist_finished_game` from players sorted by `true_victory_points` descending (includes hidden VP dev cards — the internal win-check score, not the redacted one other players see live).
 
 ---
 
