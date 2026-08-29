@@ -2,7 +2,11 @@ import random
 from dataclasses import dataclass, field
 from typing import Literal
 
-from app.game.board import Board, generate_board
+from app.game import engine
+from app.game.board import Board, generate_board, topology_for
+from app.game.placement import GameError
+from app.game.state import GameState
+from app.game.topology import Topology
 
 CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 CODE_LENGTH = 6
@@ -22,9 +26,10 @@ class Player:
     sid: str
     name: str
     is_host: bool = False
+    connected: bool = True
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "is_host": self.is_host}
+        return {"name": self.name, "is_host": self.is_host, "connected": self.connected}
 
 
 @dataclass
@@ -34,6 +39,8 @@ class Room:
     players: list[Player] = field(default_factory=list)
     phase: Literal["lobby", "in_game"] = "lobby"
     board: Board | None = None
+    topology: Topology | None = None
+    game: GameState | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -42,7 +49,13 @@ class Room:
             "players": [p.to_dict() for p in self.players],
             "phase": self.phase,
             "board": self.board.model_dump(mode="json") if self.board else None,
+            "game": self._game_dict(),
         }
+
+    def _game_dict(self) -> dict | None:
+        if self.game is None:
+            return None
+        return self.game.to_dict(legal=engine.legal_moves(self.topology, self.game))
 
 
 def _validate_name(name: str) -> str:
@@ -52,6 +65,58 @@ def _validate_name(name: str) -> str:
     if len(name) > MAX_NAME_LENGTH:
         raise RoomError("invalid_name", f"name must be {MAX_NAME_LENGTH} characters or fewer")
     return name
+
+
+def _action_setup_settlement(room: Room, name: str, payload: dict):
+    engine.setup_settlement(room.board, room.topology, room.game, name, payload.get("vertex"))
+
+
+def _action_setup_road(room: Room, name: str, payload: dict):
+    engine.setup_road(room.board, room.topology, room.game, name, payload.get("edge"))
+
+
+def _action_roll(room: Room, name: str, payload: dict):
+    engine.roll(room.board, room.topology, room.game, name)
+
+
+def _action_discard(room: Room, name: str, payload: dict):
+    engine.discard(room.game, name, payload.get("resources") or {})
+
+
+def _action_move_robber(room: Room, name: str, payload: dict):
+    from app.game.coords import Axial
+
+    q, r = payload.get("hex", (None, None))
+    engine.move_robber(room.board, room.topology, room.game, name, Axial(q, r), payload.get("steal_from"))
+
+
+def _action_build_settlement(room: Room, name: str, payload: dict):
+    engine.build_settlement(room.board, room.topology, room.game, name, payload.get("vertex"))
+
+
+def _action_build_road(room: Room, name: str, payload: dict):
+    engine.build_road(room.board, room.topology, room.game, name, payload.get("edge"))
+
+
+def _action_build_city(room: Room, name: str, payload: dict):
+    engine.build_city(room.board, room.topology, room.game, name, payload.get("vertex"))
+
+
+def _action_end_turn(room: Room, name: str, payload: dict):
+    engine.end_turn(room.board, room.topology, room.game, name)
+
+
+_GAME_ACTIONS = {
+    "setup_settlement": _action_setup_settlement,
+    "setup_road": _action_setup_road,
+    "roll": _action_roll,
+    "discard": _action_discard,
+    "move_robber": _action_move_robber,
+    "build_settlement": _action_build_settlement,
+    "build_road": _action_build_road,
+    "build_city": _action_build_city,
+    "end_turn": _action_end_turn,
+}
 
 
 class RoomManager:
@@ -117,7 +182,24 @@ class RoomManager:
             raise RoomError("not_enough_players", "need at least 2 players to start")
 
         room.board = generate_board(len(room.players))
+        room.topology = topology_for(room.board)
+        room.game = engine.new_game(room.board, [p.name for p in room.players])
         room.phase = "in_game"
+        return room
+
+    def game_action(self, sid: str, action: str, payload: dict) -> Room:
+        room = self._room_for_sid(sid)
+        if room.game is None:
+            raise RoomError("not_in_game", "the game hasn't started yet")
+        player = next((p for p in room.players if p.sid == sid), None)
+        if player is None:
+            raise RoomError("not_found", "you are not in this room")
+
+        handler = _GAME_ACTIONS.get(action)
+        if handler is None:
+            raise GameError("unknown_action", f"unknown action: {action}")
+
+        handler(room, player.name, payload or {})
         return room
 
     def remove_player(self, sid: str) -> Room | None:
@@ -127,6 +209,12 @@ class RoomManager:
         room = self.rooms.get(code)
         if room is None:
             return None
+
+        if room.phase == "in_game":
+            for p in room.players:
+                if p.sid == sid:
+                    p.connected = False
+            return room
 
         was_host = any(p.sid == sid and p.is_host for p in room.players)
         room.players = [p for p in room.players if p.sid != sid]

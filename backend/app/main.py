@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth import router as auth_router
 from app.db import create_pool
+from app.game.placement import GameError
 from app.rooms import RoomError, RoomManager
 
 
@@ -44,7 +45,7 @@ def room_handler(fn):
     async def wrapper(sid, *args, **kwargs):
         try:
             return await fn(sid, *args, **kwargs)
-        except RoomError as exc:
+        except (RoomError, GameError) as exc:
             return {"error": exc.code, "message": exc.message}
         except Exception:
             return {"error": "server_error", "message": "something went wrong"}
@@ -87,6 +88,14 @@ async def join_room(sid, data):
 async def start_game(sid, data):
     room = room_manager.start_game(sid)
     await sio.emit("game_started", room.to_dict(), room=room.code)
+    return {"room": room.to_dict()}
+
+
+@sio.event
+@room_handler
+async def game_action(sid, data):
+    room = room_manager.game_action(sid, data.get("action"), data.get("payload"))
+    await sio.emit("game_updated", room.to_dict(), room=room.code)
     return {"room": room.to_dict()}
 
 
