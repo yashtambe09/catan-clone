@@ -2,6 +2,7 @@ import random
 
 from app.game.board import RESOURCE_BY_TERRAIN, Board, Terrain
 from app.game.ids import TopologyIndex
+from app.game.longest_road import recompute_longest_road
 from app.game.placement import (
     GameError,
     check_city,
@@ -88,6 +89,7 @@ def setup_settlement(board: Board, topology, state: GameState, name: str, vid: s
     state.players[name].settlements_left -= 1
     state.setup_last_vertex = vid
     state.phase = Phase.SETUP_ROAD
+    recompute_longest_road(index, state)
 
 
 def setup_road(board: Board, topology, state: GameState, name: str, eid: str):
@@ -111,6 +113,8 @@ def setup_road(board: Board, topology, state: GameState, name: str, eid: str):
         state.current_index = 0
     else:
         state.phase = Phase.SETUP_SETTLEMENT
+
+    recompute_longest_road(index, state)
 
 
 def _distribute(board: Board, index: TopologyIndex, state: GameState, total: int):
@@ -223,6 +227,7 @@ def build_settlement(board: Board, topology, state: GameState, name: str, vid: s
     pay(player, COSTS["settlement"])
     player.settlements.add(vid)
     player.settlements_left -= 1
+    recompute_longest_road(index, state)
 
 
 def build_road(board: Board, topology, state: GameState, name: str, eid: str):
@@ -238,6 +243,7 @@ def build_road(board: Board, topology, state: GameState, name: str, eid: str):
     pay(player, COSTS["road"])
     player.roads.add(eid)
     player.roads_left -= 1
+    recompute_longest_road(index, state)
 
 
 def build_city(board: Board, topology, state: GameState, name: str, vid: str):
@@ -448,6 +454,88 @@ def play_knight(board: Board, topology, state: GameState, name: str, hex_coord, 
     player.dev_cards["knight"] -= 1
     player.dev_played["knight"] += 1
     player.knights_played += 1
+
+
+def play_monopoly(board: Board, topology, state: GameState, name: str, resource: str):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+
+    player = state.players[name]
+    if player.dev_cards.get("monopoly", 0) <= 0:
+        raise GameError("no_such_card", "you have no monopoly card to play")
+    if resource not in RESOURCES:
+        raise GameError("invalid_resource", "unknown resource")
+
+    for other_name, other in state.players.items():
+        if other_name == name:
+            continue
+        taken = other.resources.get(resource, 0)
+        other.resources[resource] = 0
+        player.resources[resource] += taken
+
+    player.dev_cards["monopoly"] -= 1
+    player.dev_played["monopoly"] += 1
+
+
+def play_year_of_plenty(board: Board, topology, state: GameState, name: str, resources: list):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+
+    player = state.players[name]
+    if player.dev_cards.get("year_of_plenty", 0) <= 0:
+        raise GameError("no_such_card", "you have no year of plenty card to play")
+    if not isinstance(resources, list) or len(resources) != 2:
+        raise GameError("invalid_resource", "must take exactly 2 resources")
+    for r in resources:
+        if r not in RESOURCES:
+            raise GameError("invalid_resource", "unknown resource")
+
+    for r in resources:
+        player.resources[r] += 1
+
+    player.dev_cards["year_of_plenty"] -= 1
+    player.dev_played["year_of_plenty"] += 1
+
+
+def play_road_building(board: Board, topology, state: GameState, name: str, edges: list):
+    _require_phase(state, Phase.BUILD)
+    _require_actor(state, name)
+    index = _index(topology)
+
+    player = state.players[name]
+    if player.dev_cards.get("road_building", 0) <= 0:
+        raise GameError("no_such_card", "you have no road building card to play")
+    if not isinstance(edges, list) or not 0 <= len(edges) <= 2:
+        raise GameError("invalid_action", "must place at most 2 roads")
+    if player.roads_left <= 0:
+        raise GameError("no_pieces_left", "no roads left to place")
+
+    if not edges:
+        if legal_road_spots(index, state, name, setup=False):
+            raise GameError("invalid_action", "you must place a road if you have a legal spot")
+    else:
+        saved_roads = set(player.roads)
+        saved_left = player.roads_left
+        try:
+            for eid in edges:
+                if player.roads_left <= 0:
+                    raise GameError("no_pieces_left", "no roads left to place")
+                check_road(index, state, name, eid, setup=False)
+                player.roads.add(eid)
+                player.roads_left -= 1
+        except GameError:
+            player.roads = saved_roads
+            player.roads_left = saved_left
+            raise
+
+        if len(edges) < 2 and player.roads_left > 0 and legal_road_spots(index, state, name, setup=False):
+            player.roads = saved_roads
+            player.roads_left = saved_left
+            raise GameError("invalid_action", "must place two roads")
+
+    player.dev_cards["road_building"] -= 1
+    player.dev_played["road_building"] += 1
+    recompute_longest_road(index, state)
 
 
 def legal_moves(board: Board, topology, state: GameState) -> dict:

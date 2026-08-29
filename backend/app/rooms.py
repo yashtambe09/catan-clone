@@ -147,6 +147,18 @@ def _action_play_knight(room: Room, name: str, payload: dict):
     engine.play_knight(room.board, room.topology, room.game, name, Axial(q, r), payload.get("steal_from"))
 
 
+def _action_play_monopoly(room: Room, name: str, payload: dict):
+    engine.play_monopoly(room.board, room.topology, room.game, name, payload.get("resource"))
+
+
+def _action_play_year_of_plenty(room: Room, name: str, payload: dict):
+    engine.play_year_of_plenty(room.board, room.topology, room.game, name, payload.get("resources") or [])
+
+
+def _action_play_road_building(room: Room, name: str, payload: dict):
+    engine.play_road_building(room.board, room.topology, room.game, name, payload.get("edges") or [])
+
+
 _GAME_ACTIONS = {
     "setup_settlement": _action_setup_settlement,
     "setup_road": _action_setup_road,
@@ -165,6 +177,9 @@ _GAME_ACTIONS = {
     "trade_cancel": _action_trade_cancel,
     "buy_dev_card": _action_buy_dev_card,
     "play_knight": _action_play_knight,
+    "play_monopoly": _action_play_monopoly,
+    "play_year_of_plenty": _action_play_year_of_plenty,
+    "play_road_building": _action_play_road_building,
 }
 
 
