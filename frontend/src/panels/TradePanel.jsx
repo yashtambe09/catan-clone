@@ -11,7 +11,19 @@ function ResourceAmounts({ amounts, onChange }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       {RESOURCES.map((r) => (
         <div key={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, textTransform: 'capitalize' }}>
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 12,
+              textTransform: 'capitalize',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             <span
               style={{
                 width: 9,
@@ -19,6 +31,7 @@ function ResourceAmounts({ amounts, onChange }) {
                 borderRadius: '50%',
                 background: `var(--resource-${r})`,
                 display: 'inline-block',
+                flexShrink: 0,
               }}
             />
             {r}
@@ -27,7 +40,7 @@ function ResourceAmounts({ amounts, onChange }) {
             className="input"
             type="number"
             min="0"
-            style={{ width: 56, padding: '6px 8px' }}
+            style={{ width: 60, flexShrink: 0, padding: '6px 8px' }}
             value={amounts[r] || ''}
             onChange={(e) => onChange({ ...amounts, [r]: e.target.value })}
           />
@@ -45,7 +58,7 @@ function BankTrade({ bankRatios, act }) {
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 12 }}>
       <span style={{ fontWeight: 700, fontSize: 14 }}>Bank Trade</span>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <select className="input" value={give} onChange={(e) => setGive(e.target.value)}>
           {RESOURCES.map((r) => (
             <option key={r} value={r}>
@@ -53,7 +66,7 @@ function BankTrade({ bankRatios, act }) {
             </option>
           ))}
         </select>
-        <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>for</span>
+        <span style={{ fontSize: 12, color: 'var(--color-muted)', textAlign: 'center' }}>for</span>
         <select className="input" value={want} onChange={(e) => setWant(e.target.value)}>
           {RESOURCES.filter((r) => r !== give).map((r) => (
             <option key={r} value={r}>

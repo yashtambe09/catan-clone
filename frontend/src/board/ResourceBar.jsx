@@ -1,6 +1,17 @@
 import { usePrevious } from '../hooks/usePrevious'
+import woodCard from '../assets/resources/wood.svg'
+import brickCard from '../assets/resources/brick.svg'
+import sheepCard from '../assets/resources/sheep.svg'
+import wheatCard from '../assets/resources/wheat.svg'
+import oreCard from '../assets/resources/ore.svg'
+import devCardBack from '../assets/dev-cards/card-back.svg'
 
 const RESOURCES = ['wood', 'brick', 'sheep', 'wheat', 'ore']
+const RESOURCE_CARD_ICONS = { wood: woodCard, brick: brickCard, sheep: sheepCard, wheat: wheatCard, ore: oreCard }
+// Resource/dev-card art is a 120x168 card silhouette (5:7 ratio) - scaled down
+// to a small chip icon here, same ratio preserved.
+const CARD_ICON_WIDTH = 22
+const CARD_ICON_HEIGHT = 31
 
 function ResourceBar({ me, canRoll, act }) {
   const resources = me?.resources || {}
@@ -38,14 +49,12 @@ function ResourceBar({ me, canRoll, act }) {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                <span
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    background: `var(--resource-${r})`,
-                    display: 'inline-block',
-                  }}
+                <img
+                  src={RESOURCE_CARD_ICONS[r]}
+                  alt={r}
+                  width={CARD_ICON_WIDTH}
+                  height={CARD_ICON_HEIGHT}
+                  style={{ borderRadius: 3, flexShrink: 0 }}
                 />
                 <span style={{ fontWeight: 700, fontSize: 13 }}>{value}</span>
                 {delta > 0 && (
@@ -78,14 +87,12 @@ function ResourceBar({ me, canRoll, act }) {
               border: '1px solid var(--color-border)',
             }}
           >
-            <span
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                background: 'var(--resource-devcard)',
-                display: 'inline-block',
-              }}
+            <img
+              src={devCardBack}
+              alt="dev cards"
+              width={CARD_ICON_WIDTH}
+              height={CARD_ICON_HEIGHT}
+              style={{ borderRadius: 3, flexShrink: 0 }}
             />
             <span style={{ fontWeight: 700, fontSize: 13 }}>{devCount} dev card{devCount === 1 ? '' : 's'}</span>
           </div>

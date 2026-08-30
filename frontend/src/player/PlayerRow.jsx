@@ -59,7 +59,11 @@ function PlayerRow({ player, seatIndex, isViewer, isCurrentTurn, hasLongestRoad,
             <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--color-muted)' }}>[disconnected]</span>
           )}
         </div>
-        {!compact && <div style={{ fontSize: 12, color: 'var(--color-muted)' }}>{cardCount(player)} cards</div>}
+        {!compact && (
+          <div style={{ fontSize: 12, color: 'var(--color-muted)' }}>
+            {cardCount(player)} cards · {player.dev_card_count ?? 0} dev
+          </div>
+        )}
       </div>
       <div
         key={player.victory_points}
