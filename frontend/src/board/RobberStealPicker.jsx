@@ -11,7 +11,10 @@ function RobberStealPicker({ players, onConfirm, onCancel }) {
         zIndex: 20,
       }}
     >
-      <div className="card card-shadow" style={{ width: 320, padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div
+        className="card card-shadow"
+        style={{ width: 320, maxWidth: '90vw', boxSizing: 'border-box', padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}
+      >
         <h2 style={{ fontSize: 18 }}>Move the robber</h2>
         <p style={{ margin: 0, fontSize: 14, color: 'var(--color-muted)' }}>
           Steal a resource from a player on this hex, or leave it be.

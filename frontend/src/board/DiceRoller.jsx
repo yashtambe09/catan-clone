@@ -11,7 +11,7 @@ function DiceRoller({ lastRoll }) {
   if (!lastRoll) return null
 
   return (
-    <div className="dice-roll-anim" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div className="dice-roll-anim" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
       <img src={DIE_FACES[lastRoll[0] - 1]} width={34} height={34} alt={`die ${lastRoll[0]}`} />
       <img src={DIE_FACES[lastRoll[1] - 1]} width={34} height={34} alt={`die ${lastRoll[1]}`} />
       <span style={{ fontSize: 13, color: 'var(--color-muted)', fontWeight: 600 }}>

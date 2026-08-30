@@ -23,7 +23,10 @@ function DiscardModal({ required, onSubmit }) {
         zIndex: 20,
       }}
     >
-      <div className="card card-shadow" style={{ width: 340, padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div
+        className="card card-shadow"
+        style={{ width: 340, maxWidth: '90vw', boxSizing: 'border-box', padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}
+      >
         <h2 style={{ fontSize: 18 }}>Discard {required} cards</h2>
         <p style={{ margin: 0, fontSize: 14, color: 'var(--color-muted)' }}>
           A 7 was rolled — you have more than 7 cards.

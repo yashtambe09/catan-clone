@@ -38,7 +38,7 @@ function GameScreen({ room, myName, act }) {
   }
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+    <div className="game-screen">
       {error && (
         <div
           style={{
@@ -60,7 +60,7 @@ function GameScreen({ room, myName, act }) {
         </div>
       )}
       <div className="game-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <img src={logo} width={22} height={22} alt="" />
           <div>
             <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 15, lineHeight: 1.2 }}>

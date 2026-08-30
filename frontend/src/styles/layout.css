@@ -1,5 +1,22 @@
 /* Game screen layout — desktop defaults, overridden at <=768px for phones/tablets */
 
+.game-screen {
+  width: 100%;
+  /* 100vh is the *large* viewport (as if browser chrome were hidden) on
+     mobile - taller than what's actually visible whenever the address bar
+     is showing, which silently pushes the last flex children (resource
+     bar, and the fixed-position action sheet's anchor point) below the
+     real fold. 100dvh tracks the true visible viewport and is now widely
+     supported; the 100vh line is a fallback for browsers that don't
+     recognize dvh (which simply ignore that declaration). */
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
 .game-header {
   flex-shrink: 0;
   height: 64px;
@@ -153,6 +170,7 @@
 
   .mobile-action-sheet-body.is-open {
     max-height: 60vh;
+    max-height: 60dvh;
     padding: 14px;
   }
 }

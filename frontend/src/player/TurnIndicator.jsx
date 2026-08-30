@@ -21,6 +21,8 @@ function TurnIndicator({ isMe, currentPlayerName, phase }) {
         borderRadius: 999,
         background: isMe ? 'var(--resource-wheat)' : 'var(--color-bg)',
         border: isMe ? 'none' : '1px solid var(--color-border-soft)',
+        minWidth: 0,
+        flexShrink: 1,
       }}
     >
       <span
@@ -32,7 +34,19 @@ function TurnIndicator({ isMe, currentPlayerName, phase }) {
           flexShrink: 0,
         }}
       />
-      <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-ink)' }}>{message}</span>
+      <span
+        style={{
+          fontWeight: 700,
+          fontSize: 14,
+          color: 'var(--color-ink)',
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {message}
+      </span>
     </div>
   )
 }
