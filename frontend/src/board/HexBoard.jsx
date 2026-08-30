@@ -246,8 +246,8 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
                 cx={x}
                 cy={y}
                 r={vertexHitRadius}
-                fill="var(--color-accent)"
-                stroke="#fdf8ee"
+                fill="oklch(52% 0.16 35 / 0.2)"
+                stroke="var(--color-accent)"
                 strokeWidth="2"
                 style={{ cursor: 'pointer' }}
                 onClick={() => handleVertexClick(vid)}
@@ -281,7 +281,7 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
               return (
                 <g key={eid} style={{ cursor: 'pointer' }} onClick={() => handleEdgeClick(eid)}>
                   <line x1={ax} y1={ay} x2={bx} y2={by} stroke="transparent" strokeWidth={edgeHitWidth} />
-                  <line x1={ax} y1={ay} x2={bx} y2={by} stroke="var(--color-accent)" strokeWidth={5} strokeLinecap="round" />
+                  <line x1={ax} y1={ay} x2={bx} y2={by} stroke="oklch(52% 0.16 35 / 0.35)" strokeWidth={5} strokeLinecap="round" />
                 </g>
               )
             })}

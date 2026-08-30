@@ -81,18 +81,21 @@ export function useZoomPan() {
     hasDraggedRef.current = false
 
     pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
-    try {
-      viewportRef.current?.setPointerCapture(e.pointerId)
-    } catch {
-      // Ignore - a pointerId not recognized as active (e.g. certain
-      // synthetic/edge-case events) shouldn't abort gesture tracking.
-    }
 
     if (pointersRef.current.size === 1) {
       dragStartRef.current = { x: e.clientX, y: e.clientY }
       gestureStartRef.current = { x: e.clientX, y: e.clientY }
       pinchStartRef.current = null
     } else if (pointersRef.current.size === 2) {
+      // Two fingers is unambiguously a pinch, never a tap - safe to capture
+      // immediately so the gesture keeps tracking even if a finger slides
+      // outside the viewport's bounds.
+      try {
+        viewportRef.current?.setPointerCapture(e.pointerId)
+      } catch {
+        // Ignore - a pointerId not recognized as active (e.g. certain
+        // synthetic/edge-case events) shouldn't abort gesture tracking.
+      }
       const pts = [...pointersRef.current.values()]
       const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
       const rect = viewportRef.current.getBoundingClientRect()
@@ -140,11 +143,26 @@ export function useZoomPan() {
       // would get this backwards: a real drag's individual move events are
       // each only a few px apart (so it would rarely trip), while a single
       // jittery tap sample can look identical to a real drag step.
-      if (gestureStartRef.current) {
+      if (gestureStartRef.current && !hasDraggedRef.current) {
         const totalDx = e.clientX - gestureStartRef.current.x
         const totalDy = e.clientY - gestureStartRef.current.y
         if (Math.hypot(totalDx, totalDy) > DRAG_THRESHOLD) {
           hasDraggedRef.current = true
+          // Only capture once this is confirmed to be a real drag, not a tap -
+          // setPointerCapture redirects ALL subsequent events for this
+          // pointer to the viewport, including the native "click" event that
+          // follows pointerup. Capturing unconditionally on pointerdown (the
+          // previous approach) meant a real click's click event always
+          // landed on the viewport div instead of the vertex/edge shape
+          // underneath, so it never reached HexBoard's onClick handlers -
+          // invisible to tests that dispatch synthetic click events directly
+          // onto the target, since those skip capture-based redirection
+          // entirely.
+          try {
+            viewportRef.current?.setPointerCapture(e.pointerId)
+          } catch {
+            // Ignore - pointerId may no longer be active.
+          }
         }
       }
       const dx = e.clientX - dragStartRef.current.x
