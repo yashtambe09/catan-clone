@@ -64,12 +64,23 @@ uses a resource-colored top panel with a cream icon silhouette, corner pips,
 and a name label.
 
 ### `tiles/` — board hexes
-`forest.svg` (wood), `hills.svg` (brick), `pasture.svg` (sheep),
-`fields.svg` (wheat), `mountains.svg` (ore), `desert.svg`, plus
-`border-water.svg` for the ocean frame around the playable board. 200×200
-viewBox, pointy-top hexagon (matches the axial hex-grid orientation the Day
-3-4 board generator will use). Reuses the same icon glyphs as the resource
-cards for visual consistency between hand and board.
+`forest.png` (wood), `hills.png` (brick), `pasture.png` (sheep),
+`fields.png` (wheat), `mountains.png` (ore), `desert.png` — **swapped from
+the original flat SVGs (Days 17-25) to the painterly "Settlers Kit" PNG
+pack** (`settlerstiles.zip`, part of [Settlers
+Kit](https://opengameart.org/content/settlers-kit) by Rainbow Design,
+licensed **CC-BY-SA 3.0 / GPL 3.0 / GPL 2.0**, attribution optional per the
+author but credited here anyway). 219×256px RGBA, pointy-top hexagon —
+verified the aspect ratio matches the true hex bounding box almost exactly
+(no viewBox-scaling constant needed; rendered at
+`HEX_SIZE*sqrt(3)` × `HEX_SIZE*2` directly). `border-water.svg` (the
+original flat-SVG ocean frame) is unused and kept as-is — not part of this
+swap.
+
+Deliberately **not** swapped: ports, pieces, resource cards, dev cards, and
+all UI chrome stay on the original flat-vector system — this pack only
+covers terrain tiles and number tokens (see below), and the rest of the UI
+would clash if it half-matched a different asset's painterly style.
 
 ### `ports/` — harbors
 `generic.svg` (3:1, any resource) + `wood.svg`, `brick.svg`, `sheep.svg`,
@@ -112,11 +123,22 @@ rather than shipping 4 files).
 
 ---
 
+## `numbers/` — number tokens
+
+`2.png` through `12.png` (no `7` — never appears on a hex), from the same
+**Settlers Kit** pack/license as `tiles/` above (`numbers2.zip`). 70×70px
+RGBA, parchment disc with the number baked in. **Originally** drawn
+directly in code (a plain `<circle>` + `<text>`, as noted below in the
+project's early history) — swapped to this pack alongside the tiles.
+
+One gap versus the original: the pack colors every digit the same
+maroon, unlike the physical game's convention (and this project's
+original code) of showing 6/8 in red as a "hot number" cue. Preserved
+that distinction with a thin accent-colored ring drawn in code around
+hot-number tokens, rather than losing the cue entirely.
+
 ## What's deliberately not here
 
-- **Number tokens** (the 2-12 discs on each hex) aren't a static asset —
-  they're simple enough (a circle + text) to draw directly in code, as
-  already done in the Day 1-2 game-screen mockup.
 - **Per-player-color pre-rendered pieces** (e.g. `settlement-red.svg`) —
   deliberately avoided in favor of one neutral shape recolored at render
   time. Revisit only if the mask/inline approach proves impractical once

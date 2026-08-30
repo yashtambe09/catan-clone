@@ -5,17 +5,32 @@ import { useZoomPan } from './useZoomPan'
 import Port from './Port'
 import BoardPieces from './BoardPieces'
 import RobberStealPicker from './RobberStealPicker'
-import forestTile from '../assets/tiles/forest.svg'
-import hillsTile from '../assets/tiles/hills.svg'
-import pastureTile from '../assets/tiles/pasture.svg'
-import fieldsTile from '../assets/tiles/fields.svg'
-import mountainsTile from '../assets/tiles/mountains.svg'
-import desertTile from '../assets/tiles/desert.svg'
+import forestTile from '../assets/tiles/forest.png'
+import hillsTile from '../assets/tiles/hills.png'
+import pastureTile from '../assets/tiles/pasture.png'
+import fieldsTile from '../assets/tiles/fields.png'
+import mountainsTile from '../assets/tiles/mountains.png'
+import desertTile from '../assets/tiles/desert.png'
 import robberIcon from '../assets/pieces/robber.svg'
+import number2 from '../assets/numbers/2.png'
+import number3 from '../assets/numbers/3.png'
+import number4 from '../assets/numbers/4.png'
+import number5 from '../assets/numbers/5.png'
+import number6 from '../assets/numbers/6.png'
+import number8 from '../assets/numbers/8.png'
+import number9 from '../assets/numbers/9.png'
+import number10 from '../assets/numbers/10.png'
+import number11 from '../assets/numbers/11.png'
+import number12 from '../assets/numbers/12.png'
 
 const HEX_SIZE = 50
-const TILE_VIEWBOX_RADIUS = 90 // corner-to-center distance inside the 200x200 tile SVGs
-const TILE_VIEWBOX_SIZE = 200
+// The tile PNGs (settlerstiles pack) are near-flush pointy-top hexagons
+// (219x256, ratio matches sqrt(3)/2 almost exactly), unlike the old SVGs'
+// square 200x200 canvas with an inscribed hex - so they're sized directly
+// to the real hex bounding box rather than scaled via a viewbox constant.
+const TILE_RENDER_WIDTH = HEX_SIZE * Math.sqrt(3)
+const TILE_RENDER_HEIGHT = HEX_SIZE * 2
+const NUMBER_TOKEN_SIZE = 34
 
 const TILE_ASSETS = {
   forest: forestTile,
@@ -24,6 +39,19 @@ const TILE_ASSETS = {
   fields: fieldsTile,
   mountains: mountainsTile,
   desert: desertTile,
+}
+
+const NUMBER_ASSETS = {
+  2: number2,
+  3: number3,
+  4: number4,
+  5: number5,
+  6: number6,
+  8: number8,
+  9: number9,
+  10: number10,
+  11: number11,
+  12: number12,
 }
 
 function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding, onRoadBuildingDone }) {
@@ -52,8 +80,6 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
   }
 
   const [robberQ, robberR] = board.robber
-  const tileScale = HEX_SIZE / TILE_VIEWBOX_RADIUS
-  const tileRenderSize = TILE_VIEWBOX_SIZE * tileScale
 
   const isMe = Boolean(game && myName && game.current_player === myName)
   const me = game?.players?.[myName]
@@ -154,10 +180,11 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
             >
               <image
                 href={TILE_ASSETS[hex.terrain]}
-                x={x - tileRenderSize / 2}
-                y={y - tileRenderSize / 2}
-                width={tileRenderSize}
-                height={tileRenderSize}
+                x={x - TILE_RENDER_WIDTH / 2}
+                y={y - TILE_RENDER_HEIGHT / 2}
+                width={TILE_RENDER_WIDTH}
+                height={TILE_RENDER_HEIGHT}
+                preserveAspectRatio="none"
               />
               {clickable && (
                 <polygon
@@ -170,19 +197,23 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
               )}
               {hex.number !== null && (
                 <>
-                  <circle cx={x} cy={y} r={15} fill="oklch(97% 0.01 85)" stroke="oklch(70% 0.03 70)" strokeWidth="1" />
-                  <text
-                    x={x}
-                    y={y}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontFamily="Karla, sans-serif"
-                    fontSize="14"
-                    fontWeight={isHot ? '800' : '600'}
-                    fill={isHot ? 'var(--color-accent)' : 'var(--color-ink)'}
-                  >
-                    {hex.number}
-                  </text>
+                  <image
+                    href={NUMBER_ASSETS[hex.number]}
+                    x={x - NUMBER_TOKEN_SIZE / 2}
+                    y={y - NUMBER_TOKEN_SIZE / 2}
+                    width={NUMBER_TOKEN_SIZE}
+                    height={NUMBER_TOKEN_SIZE}
+                  />
+                  {isHot && (
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={NUMBER_TOKEN_SIZE / 2 + 1}
+                      fill="none"
+                      stroke="var(--color-accent)"
+                      strokeWidth="2.5"
+                    />
+                  )}
                 </>
               )}
               {isRobber && (
