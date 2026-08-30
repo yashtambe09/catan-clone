@@ -12,6 +12,7 @@ function TurnIndicator({ isMe, currentPlayerName, phase }) {
 
   return (
     <div
+      className="turn-pulse"
       style={{
         display: 'flex',
         alignItems: 'center',

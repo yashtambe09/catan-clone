@@ -1,11 +1,8 @@
 import PlayerRow from './PlayerRow'
 
-function PlayerDashboard({ game, myName }) {
+function PlayerStrip({ game, myName }) {
   return (
-    <div className="player-dashboard">
-      <div className="eyebrow" style={{ marginBottom: 4 }}>
-        Players
-      </div>
+    <div className="player-strip">
       {game.order.map((name, i) => (
         <PlayerRow
           key={name}
@@ -15,10 +12,11 @@ function PlayerDashboard({ game, myName }) {
           isCurrentTurn={name === game.current_player}
           hasLongestRoad={game.longest_road_holder === name}
           hasLargestArmy={game.largest_army_holder === name}
+          compact
         />
       ))}
     </div>
   )
 }
 
-export default PlayerDashboard
+export default PlayerStrip

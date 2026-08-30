@@ -218,3 +218,48 @@
 .float-up-fade {
   animation: float-up-fade 0.6s ease-out forwards;
 }
+
+@keyframes piece-pop-in {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.piece-pop-in {
+  animation: piece-pop-in 0.35s ease-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes robber-drop {
+  0% { transform: translateY(-14px) scale(0.8); opacity: 0; }
+  70% { transform: translateY(2px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.robber-drop {
+  animation: robber-drop 0.4s ease-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes turn-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.turn-pulse {
+  animation: turn-pulse 0.4s ease-out;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.badge-pop {
+  animation: badge-pop 0.4s ease-out;
+  display: inline-block;
+}

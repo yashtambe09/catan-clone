@@ -9,20 +9,17 @@ function ResourceBar({ me, canRoll, act }) {
 
   return (
     <div
+      className="resource-bar"
       style={{
-        flexShrink: 0,
-        height: 88,
         borderTop: '1px solid var(--color-border-soft)',
         background: 'var(--color-surface)',
-        display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 28px',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
         <span className="eyebrow">Your resources</span>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div className="resource-row" style={{ display: 'flex', gap: 10 }}>
           {RESOURCES.map((r) => {
             const value = resources[r] || 0
             const delta = value - (prevResources[r] ?? value)

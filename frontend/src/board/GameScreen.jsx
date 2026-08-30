@@ -5,10 +5,12 @@ import DiceRoller from './DiceRoller'
 import ResourceBar from './ResourceBar'
 import DiscardModal from './DiscardModal'
 import PlayerDashboard from '../player/PlayerDashboard'
+import PlayerStrip from '../player/PlayerStrip'
 import TurnIndicator from '../player/TurnIndicator'
 import BuildPanel from '../panels/BuildPanel'
 import TradePanel from '../panels/TradePanel'
 import DevCardHand from '../panels/DevCardHand'
+import MobileActionSheet from '../panels/MobileActionSheet'
 import logo from '../assets/icons/logo.svg'
 
 function GameScreen({ room, myName, act }) {
@@ -24,6 +26,15 @@ function GameScreen({ room, myName, act }) {
   function handleAct(action, payload) {
     if (action === 'play_knight') setPlayingKnight(false)
     act(action, payload)
+  }
+
+  const devCardHandProps = {
+    playingKnight,
+    onStartKnight: () => setPlayingKnight(true),
+    onCancelKnight: () => setPlayingKnight(false),
+    playingRoadBuilding,
+    onStartRoadBuilding: () => setPlayingRoadBuilding(true),
+    onCancelRoadBuilding: () => setPlayingRoadBuilding(false),
   }
 
   return (
@@ -48,49 +59,38 @@ function GameScreen({ room, myName, act }) {
           {error}
         </div>
       )}
-      <div
-        style={{
-          flexShrink: 0,
-          height: 64,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 28px',
-          borderBottom: '1px solid var(--color-border-soft)',
-        }}
-      >
+      <div className="game-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src={logo} width={22} height={22} alt="" />
           <div>
             <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: 15, lineHeight: 1.2 }}>
               CATAN
             </div>
-            <div style={{ fontSize: 12, color: 'var(--color-muted)', lineHeight: 1.2 }}>
+            <div className="game-header-subtitle" style={{ fontSize: 12, color: 'var(--color-muted)', lineHeight: 1.2 }}>
               Room {room.code} · {room.max_players} players
             </div>
           </div>
         </div>
 
-        <TurnIndicator isMe={isMe} currentPlayerName={game.current_player} phase={game.phase} />
+        <TurnIndicator
+          key={`${game.current_player}-${game.phase}`}
+          isMe={isMe}
+          currentPlayerName={game.current_player}
+          phase={game.phase}
+        />
 
-        <DiceRoller lastRoll={game.last_roll} turnNumber={game.turn_number} />
+        <DiceRoller
+          key={`${game.turn_number}-${game.last_roll ? game.last_roll.join(',') : 'none'}`}
+          lastRoll={game.last_roll}
+        />
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+      <PlayerStrip game={game} myName={myName} />
+
+      <div className="game-body">
         <PlayerDashboard game={game} myName={myName} />
 
-        <div
-          style={{
-            flex: 1,
-            minWidth: 0,
-            minHeight: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 20,
-            boxSizing: 'border-box',
-          }}
-        >
+        <div className="board-viewport-wrapper">
           <HexBoard
             board={room.board}
             game={game}
@@ -102,33 +102,11 @@ function GameScreen({ room, myName, act }) {
           />
         </div>
 
-        <div
-          style={{
-            width: 300,
-            flexShrink: 0,
-            boxSizing: 'border-box',
-            padding: 20,
-            borderLeft: '1px solid var(--color-border-soft)',
-            background: 'oklch(95% 0.015 85)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            overflowY: 'auto',
-          }}
-        >
+        <div className="desktop-action-panel">
           {isMe && game.phase === 'build' && (
             <>
               <BuildPanel me={me} devCardsRemaining={game.dev_cards_remaining} act={act} />
-              <DevCardHand
-                me={me}
-                act={act}
-                playingKnight={playingKnight}
-                onStartKnight={() => setPlayingKnight(true)}
-                onCancelKnight={() => setPlayingKnight(false)}
-                playingRoadBuilding={playingRoadBuilding}
-                onStartRoadBuilding={() => setPlayingRoadBuilding(true)}
-                onCancelRoadBuilding={() => setPlayingRoadBuilding(false)}
-              />
+              <DevCardHand me={me} act={act} {...devCardHandProps} />
             </>
           )}
 
@@ -147,6 +125,15 @@ function GameScreen({ room, myName, act }) {
       </div>
 
       <ResourceBar me={me} canRoll={isMe && game.phase === 'roll'} act={act} />
+
+      <MobileActionSheet
+        game={game}
+        me={me}
+        myName={myName}
+        act={act}
+        isMe={isMe}
+        {...devCardHandProps}
+      />
 
       {myDiscard && <DiscardModal required={myDiscard} onSubmit={(resources) => act('discard', { resources })} />}
     </div>

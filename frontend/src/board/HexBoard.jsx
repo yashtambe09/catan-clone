@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { axialToPixel, hexCorners } from './hexMath'
 import { vertexPixel, edgePixel } from './boardGeometry'
+import { useZoomPan } from './useZoomPan'
 import Port from './Port'
+import BoardPieces from './BoardPieces'
 import RobberStealPicker from './RobberStealPicker'
 import forestTile from '../assets/tiles/forest.svg'
 import hillsTile from '../assets/tiles/hills.svg'
@@ -27,6 +29,10 @@ const TILE_ASSETS = {
 function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding, onRoadBuildingDone }) {
   const [selectedRobberHex, setSelectedRobberHex] = useState(null)
   const [roadBuildingPicks, setRoadBuildingPicks] = useState([])
+  const { transform, viewportRef, hasDraggedRef, reset, handlers } = useZoomPan()
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const vertexHitRadius = isMobile ? 16 : 9
+  const edgeHitWidth = isMobile ? 26 : 16
 
   const centers = board.hexes.map((hex) => {
     const [q, r] = hex.coord
@@ -60,6 +66,7 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
   const pickedRoadEdges = new Set(roadBuildingPicks)
 
   function handleVertexClick(vid) {
+    if (hasDraggedRef.current) return
     if (game.phase === 'setup_settlement') {
       act('setup_settlement', { vertex: vid })
     } else if (game.phase === 'build') {
@@ -72,6 +79,7 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
   }
 
   function handleEdgeClick(eid) {
+    if (hasDraggedRef.current) return
     if (playingRoadBuilding) {
       if (pickedRoadEdges.has(eid)) return
       const next = [...roadBuildingPicks, eid]
@@ -92,6 +100,7 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
   }
 
   function handleHexClick(coord) {
+    if (hasDraggedRef.current) return
     if (!showRobberHexTargets) return
     setSelectedRobberHex(coord)
   }
@@ -109,9 +118,28 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
 
   return (
     <>
+      <div
+        ref={viewportRef}
+        className="hexboard-viewport"
+        style={{
+          touchAction: 'none',
+          overflow: 'hidden',
+          width: '100%',
+          height: '100%',
+          maxWidth: 720,
+          position: 'relative',
+        }}
+        {...handlers}
+      >
       <svg
         viewBox={`${minX} ${minY} ${width} ${height}`}
-        style={{ width: '100%', height: '100%', maxWidth: 720, maxHeight: '100%' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          maxHeight: '100%',
+          transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
+          transformOrigin: '0 0',
+        }}
       >
         {centers.map(({ hex, x, y }) => {
           const isRobber = hex.coord[0] === robberQ && hex.coord[1] === robberR
@@ -158,7 +186,15 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
                 </>
               )}
               {isRobber && (
-                <image href={robberIcon} x={x - 10} y={y - 20} width={20} height={26} />
+                <image
+                  key={`robber-${robberQ},${robberR}`}
+                  href={robberIcon}
+                  x={x - 10}
+                  y={y - 20}
+                  width={20}
+                  height={26}
+                  className="robber-drop"
+                />
               )}
             </g>
           )
@@ -168,6 +204,8 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
           <Port key={port.edge} port={port} size={HEX_SIZE} centroid={centroid} />
         ))}
 
+        {game && <BoardPieces game={game} size={HEX_SIZE} />}
+
         {showVertexTargets &&
           legalVertices.map((vid) => {
             const { x, y } = vertexPixel(vid, HEX_SIZE)
@@ -176,7 +214,7 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
                 key={vid}
                 cx={x}
                 cy={y}
-                r={9}
+                r={vertexHitRadius}
                 fill="var(--color-accent)"
                 stroke="#fdf8ee"
                 strokeWidth="2"
@@ -211,7 +249,7 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
               const { ax, ay, bx, by } = edgePixel(eid, HEX_SIZE)
               return (
                 <g key={eid} style={{ cursor: 'pointer' }} onClick={() => handleEdgeClick(eid)}>
-                  <line x1={ax} y1={ay} x2={bx} y2={by} stroke="transparent" strokeWidth={16} />
+                  <line x1={ax} y1={ay} x2={bx} y2={by} stroke="transparent" strokeWidth={edgeHitWidth} />
                   <line x1={ax} y1={ay} x2={bx} y2={by} stroke="var(--color-accent)" strokeWidth={5} strokeLinecap="round" />
                 </g>
               )
@@ -233,6 +271,23 @@ function HexBoard({ board, game, myName, act, playingKnight, playingRoadBuilding
           )
         })}
       </svg>
+
+        <button
+          className="btn btn-ghost"
+          onClick={reset}
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            right: 8,
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            fontSize: 12,
+            padding: '4px 10px',
+          }}
+        >
+          Reset view
+        </button>
+      </div>
 
       {selectedRobberHex && (
         <RobberStealPicker
