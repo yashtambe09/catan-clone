@@ -2,7 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 const MIN_SCALE = 0.75
 const MAX_SCALE = 3
-const DRAG_THRESHOLD = 5
+// Compared against *cumulative* distance from the gesture's start point, not
+// the previous sample - see gestureStartRef below. 10px matches common
+// touch-slop conventions and tolerates realistic mouse/finger jitter during
+// an intended single tap.
+const DRAG_THRESHOLD = 10
 
 function clampScale(scale) {
   return Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale))
@@ -25,7 +29,8 @@ export function useZoomPan() {
   const viewportRef = useRef(null)
   const hasDraggedRef = useRef(false)
   const pointersRef = useRef(new Map()) // pointerId -> {x, y}
-  const dragStartRef = useRef(null) // {x, y} at last drag sample (single pointer)
+  const dragStartRef = useRef(null) // {x, y} at the *last* move sample (single pointer) - used for the incremental per-step pan delta
+  const gestureStartRef = useRef(null) // {x, y} at the *original* pointerdown (single pointer) - fixed for the whole gesture, used only for the cumulative drag-threshold check
   const pinchStartRef = useRef(null) // {dist, midX, midY, scale, x, y} at pinch start
 
   const reset = useCallback(() => {
@@ -85,6 +90,7 @@ export function useZoomPan() {
 
     if (pointersRef.current.size === 1) {
       dragStartRef.current = { x: e.clientX, y: e.clientY }
+      gestureStartRef.current = { x: e.clientX, y: e.clientY }
       pinchStartRef.current = null
     } else if (pointersRef.current.size === 2) {
       const pts = [...pointersRef.current.values()]
@@ -100,6 +106,7 @@ export function useZoomPan() {
         y: prev.y,
       }
       dragStartRef.current = null
+      gestureStartRef.current = null
     }
   }, [])
 
@@ -128,11 +135,20 @@ export function useZoomPan() {
     }
 
     if (pointersRef.current.size === 1 && dragStartRef.current) {
+      // Cumulative distance from the gesture's start - not the previous
+      // sample - decides drag-vs-tap. Checking against the previous sample
+      // would get this backwards: a real drag's individual move events are
+      // each only a few px apart (so it would rarely trip), while a single
+      // jittery tap sample can look identical to a real drag step.
+      if (gestureStartRef.current) {
+        const totalDx = e.clientX - gestureStartRef.current.x
+        const totalDy = e.clientY - gestureStartRef.current.y
+        if (Math.hypot(totalDx, totalDy) > DRAG_THRESHOLD) {
+          hasDraggedRef.current = true
+        }
+      }
       const dx = e.clientX - dragStartRef.current.x
       const dy = e.clientY - dragStartRef.current.y
-      if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
-        hasDraggedRef.current = true
-      }
       const prev = transformRef.current
       applyTransform({ ...prev, x: prev.x + dx, y: prev.y + dy })
       dragStartRef.current = { x: e.clientX, y: e.clientY }
@@ -142,7 +158,10 @@ export function useZoomPan() {
   const handlePointerUp = useCallback((e) => {
     pointersRef.current.delete(e.pointerId)
     if (pointersRef.current.size < 2) pinchStartRef.current = null
-    if (pointersRef.current.size === 0) dragStartRef.current = null
+    if (pointersRef.current.size === 0) {
+      dragStartRef.current = null
+      gestureStartRef.current = null
+    }
   }, [])
 
   return {
