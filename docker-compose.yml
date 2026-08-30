@@ -40,8 +40,10 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      VITE_BACKEND_URL: http://localhost:8000
+    # No VITE_BACKEND_URL set here on purpose: frontend/src/config.js falls
+    # back to window.location.hostname, so this works unmodified whether the
+    # page is loaded via localhost or a LAN IP (needed for LAN playtesting).
+    # Set VITE_BACKEND_URL explicitly only to force a different backend host.
     depends_on:
       - backend
     deploy:
