@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm ci
+      - run: npm install
       - run: npm run build
       - name: Deploy to Cloudflare Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -50,10 +50,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Write production .env
-        shell: pwsh
+        shell: powershell
         run: |
           Set-Content -Path .env -Value "DATABASE_URL=postgresql://catan:catan@postgres:5432/catan"
           Add-Content -Path .env -Value "JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}"
       - name: Restart backend stack
-        shell: pwsh
+        shell: powershell
         run: docker compose -p catan-prod up -d --build postgres backend
