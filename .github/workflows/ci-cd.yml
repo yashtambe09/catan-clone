@@ -54,13 +54,6 @@ jobs:
     runs-on: [self-hosted, catan-laptop]
     steps:
       - uses: actions/checkout@v4
-      # The runner service doesn't inherit the interactive user's PATH, so
-      # docker.exe (installed under the user's own AppData by Docker
-      # Desktop) isn't found by default. Extend PATH for the rest of this
-      # job via GITHUB_PATH, the supported mechanism for this.
-      - name: Add Docker to PATH
-        shell: cmd
-        run: echo C:\Users\yasht\AppData\Local\Programs\DockerDesktop\resources\bin>> %GITHUB_PATH%
       - name: Write production .env
         # cmd, not powershell: a fresh Windows machine's default execution
         # policy blocks running the temp .ps1 script Actions generates for
@@ -72,5 +65,8 @@ jobs:
           echo DATABASE_URL=postgresql://catan:catan@postgres:5432/catan> .env
           echo JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}>> .env
       - name: Restart backend stack
+        # Full path, not a bare `docker` - the runner service's environment
+        # doesn't include the interactive user's PATH (where Docker Desktop
+        # added its own bin folder), so a plain `docker` isn't found.
         shell: cmd
-        run: docker compose -p catan-prod up -d --build postgres backend
+        run: '"C:\Users\yasht\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe" compose -p catan-prod up -d --build postgres backend'
