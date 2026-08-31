@@ -39,6 +39,12 @@ jobs:
       - name: Fresh install (works around npm/cli#4828)
         run: rm -rf node_modules package-lock.json && npm install
       - run: npm run build
+        env:
+          # Without this, config.js's fallback computes
+          # http://catan.mightycaptions.in:8000 for the deployed frontend -
+          # wrong host, port, and protocol. Vite bakes env vars in at build
+          # time, so this has to be set here, not at runtime.
+          VITE_BACKEND_URL: https://api.catan.mightycaptions.in
       - name: Deploy to Cloudflare Pages
         # Project *name* (catan) and its public pages.dev subdomain
         # (catan-c9v.pages.dev, auto-suffixed because the bare "catan"

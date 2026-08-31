@@ -10,6 +10,12 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catan -d catan"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
     deploy:
       resources:
         limits:
@@ -26,7 +32,16 @@ services:
       DATABASE_URL: postgresql://catan:catan@postgres:5432/catan
       JWT_SECRET: ${JWT_SECRET:-dev-only-insecure-secret-change-me}
     depends_on:
-      - postgres
+      postgres:
+        # Plain `depends_on: [postgres]` only waits for the container to
+        # start, not for Postgres to actually be ready to accept
+        # connections - on a cold start (empty pgdata volume, running
+        # first-time migrations) that race lost outright: the backend's
+        # asyncpg pool failed on lifespan startup with a bare
+        # ConnectionRefusedError, and with no restart policy the container
+        # was left "running" with nothing actually listening on 8000.
+        condition: service_healthy
+    restart: unless-stopped
     deploy:
       resources:
         limits:
