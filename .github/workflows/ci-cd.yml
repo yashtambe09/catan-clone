@@ -39,26 +39,20 @@ jobs:
       - name: Fresh install (works around npm/cli#4828)
         run: rm -rf node_modules package-lock.json && npm install
       - run: npm run build
-      # Diagnostic: "Project not found" for catan-c9v persisted even after
-      # fixing the account ID. This lists what the API token/account can
-      # actually see, to find out whether the project is really missing,
-      # under a different name, or an account-scope issue.
-      - name: List Cloudflare Pages projects (diagnostic)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: frontend
-          command: pages project list
       - name: Deploy to Cloudflare Pages
+        # Project *name* (catan) and its public pages.dev subdomain
+        # (catan-c9v.pages.dev, auto-suffixed because the bare "catan"
+        # subdomain wasn't available) are independent in Cloudflare Pages -
+        # confirmed via the dashboard's own URL (/pages/view/catan) and
+        # breadcrumb ("Workers & Pages > catan"), after catan-c9v as the
+        # --project-name kept failing with "Project not found".
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: frontend
-          command: pages deploy dist --project-name=catan-c9v
+          command: pages deploy dist --project-name=catan
 
   deploy-backend:
     needs: backend-tests
