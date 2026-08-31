@@ -46,7 +46,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: frontend
-          command: pages deploy dist --project-name=catan
+          command: pages deploy dist --project-name=catan-c9v
 
   deploy-backend:
     needs: backend-tests
@@ -54,6 +54,13 @@ jobs:
     runs-on: [self-hosted, catan-laptop]
     steps:
       - uses: actions/checkout@v4
+      # The runner service doesn't inherit the interactive user's PATH, so
+      # docker.exe (installed under the user's own AppData by Docker
+      # Desktop) isn't found by default. Extend PATH for the rest of this
+      # job via GITHUB_PATH, the supported mechanism for this.
+      - name: Add Docker to PATH
+        shell: cmd
+        run: echo C:\Users\yasht\AppData\Local\Programs\DockerDesktop\resources\bin>> %GITHUB_PATH%
       - name: Write production .env
         # cmd, not powershell: a fresh Windows machine's default execution
         # policy blocks running the temp .ps1 script Actions generates for
