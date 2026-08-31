@@ -32,7 +32,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm install
+      # Rollup's platform-specific optional dependency doesn't resolve
+      # correctly from a package-lock.json generated on a different OS
+      # (npm/cli#4828) - the lockfile here was generated on Windows, this
+      # runner is Linux. Deleting it forces a truly fresh resolution.
+      - name: Fresh install (works around npm/cli#4828)
+        run: rm -rf node_modules package-lock.json && npm install
       - run: npm run build
       - name: Deploy to Cloudflare Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -50,10 +55,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Write production .env
-        shell: powershell
+        # cmd, not powershell: a fresh Windows machine's default execution
+        # policy blocks running the temp .ps1 script Actions generates for
+        # `shell: powershell` steps ("running scripts is disabled on this
+        # system"). cmd has no such restriction and these steps are simple
+        # enough not to need PowerShell.
+        shell: cmd
         run: |
-          Set-Content -Path .env -Value "DATABASE_URL=postgresql://catan:catan@postgres:5432/catan"
-          Add-Content -Path .env -Value "JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}"
+          echo DATABASE_URL=postgresql://catan:catan@postgres:5432/catan> .env
+          echo JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}>> .env
       - name: Restart backend stack
-        shell: powershell
+        shell: cmd
         run: docker compose -p catan-prod up -d --build postgres backend
