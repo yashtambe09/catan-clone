@@ -44,7 +44,10 @@ jobs:
           # http://catan.mightycaptions.in:8000 for the deployed frontend -
           # wrong host, port, and protocol. Vite bakes env vars in at build
           # time, so this has to be set here, not at runtime.
-          VITE_BACKEND_URL: https://api.catan.mightycaptions.in
+          # catan-api (not api.catan) - a single-level subdomain, since
+          # Cloudflare's free Universal SSL only covers one wildcard level
+          # (*.mightycaptions.in), not *.catan.mightycaptions.in.
+          VITE_BACKEND_URL: https://catan-api.mightycaptions.in
       - name: Deploy to Cloudflare Pages
         # Project *name* (catan) and its public pages.dev subdomain
         # (catan-c9v.pages.dev, auto-suffixed because the bare "catan"
