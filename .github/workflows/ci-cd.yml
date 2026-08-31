@@ -39,6 +39,18 @@ jobs:
       - name: Fresh install (works around npm/cli#4828)
         run: rm -rf node_modules package-lock.json && npm install
       - run: npm run build
+      # Diagnostic: "Project not found" for catan-c9v persisted even after
+      # fixing the account ID. This lists what the API token/account can
+      # actually see, to find out whether the project is really missing,
+      # under a different name, or an account-scope issue.
+      - name: List Cloudflare Pages projects (diagnostic)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: frontend
+          command: pages project list
       - name: Deploy to Cloudflare Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v3
@@ -64,6 +76,8 @@ jobs:
         run: |
           echo DATABASE_URL=postgresql://catan:catan@postgres:5432/catan> .env
           echo JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}>> .env
+          echo POSTGRES_PORT=5433>> .env
+          echo BACKEND_PORT=8001>> .env
       - name: Restart backend stack
         # Full path, not a bare `docker` - the runner service's environment
         # doesn't include the interactive user's PATH (where Docker Desktop
